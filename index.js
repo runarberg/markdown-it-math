@@ -121,7 +121,7 @@ function math_inline(state, silent) {
   token = state.push('math', '', 0);
   token.content = state.src.slice(state.pos, state.posMax);
 
-  token = state.push('math_inline_close,', 'math', -1);
+  token = state.push('math_inline_close', 'math', -1);
   token.markup = String.fromCharCode(marker).repeat(2);
 
   state.pos = state.posMax + 2;

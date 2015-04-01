@@ -54,7 +54,7 @@ md.render("$$40,2$$");
 Using [TeXZilla](http://fred-wang.github.io/TeXZilla/) as renderer
 
 ```js
-var texzilla = require('./node_modules/texzilla/TeXZilla');
+var texzilla = require('texzilla');
 var md = require('markdown-it')()
         .use(require('markdown-it-math'), function(str) {
             // We need to strip the root math element out

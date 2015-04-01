@@ -37,11 +37,11 @@
   },
   "devDependencies": {
     "babelify": "^5.0.4",
-    "browserify": "^9.0.3",
+    "browserify": "^9.0.4",
     "eslint-plugin-nodeca": "^1.0.3",
-    "markdown-it": "^4.0.2",
+    "markdown-it": "^4.1.0",
     "markdown-it-testgen": "^0.1.4",
-    "texzilla": "^0.9.8",
+    "texzilla": "^0.9.9",
     "uglifyjs": "^2.4.10"
   }
 }

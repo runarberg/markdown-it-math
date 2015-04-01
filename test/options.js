@@ -17,7 +17,7 @@ describe("Options", function() {
 
 describe("Renderer", function() {
   it('Should allow another renderer', function() {
-    var texzilla = require('../node_modules/texzilla/TeXZilla');
+    var texzilla = require('texzilla');
     var md = require('markdown-it')()
           .use(require('../'), function(str) {
             // we need to strip the root element, a bit hacky
