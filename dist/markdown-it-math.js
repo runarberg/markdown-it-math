@@ -1,4 +1,4 @@
-/*! markdown-it-math 0.0.0 https://github.com/runarberg/markdown-it-math @license MIT */
+/*! markdown-it-math 1.0.2 https://github.com/runarberg/markdown-it-math @license MIT */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.markdownitMath = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 /* Object.assign
@@ -1190,10 +1190,79 @@ module.exports = {
 };
 
 },{"./lexicon":3}],6:[function(require,module,exports){
+/*!
+ * repeat-string <https://github.com/jonschlinkert/repeat-string>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+/**
+ * Expose `repeat`
+ */
+
+module.exports = repeat;
+
+/**
+ * Repeat the given `string` the specified `number`
+ * of times.
+ *
+ * **Example:**
+ *
+ * ```js
+ * var repeat = require('repeat-string');
+ * repeat('A', 5);
+ * //=> AAAAA
+ * ```
+ *
+ * @param {String} `string` The string to repeat
+ * @param {Number} `number` The number of times to repeat the string
+ * @return {String} Repeated string
+ * @api public
+ */
+
+function repeat(str, num) {
+  if (typeof str !== 'string') {
+    throw new TypeError('repeat-string expects a string.');
+  }
+
+  if (num === 1) return str;
+  if (num === 2) return str + str;
+
+  var max = str.length * num;
+  if (cache !== str || typeof cache === 'undefined') {
+    cache = str;
+    res = '';
+  }
+
+  while (max > res.length && num > 0) {
+    if (num & 1) {
+      res += str;
+    }
+
+    num >>= 1;
+    if (!num) break;
+    str += str;
+  }
+
+  return res.substr(0, max);
+}
+
+/**
+ * Results cache
+ */
+
+var res = '';
+var cache;
+
+},{}],7:[function(require,module,exports){
 /* Process inline math */
 
 'use strict';
 
+var repeat = require('repeat-string');
 require('./lib/polyfills');
 
 
@@ -1308,13 +1377,13 @@ function math_inline(state, silent) {
 
   // Earlier we checked !silent, but this implementation does not need it
   token = state.push('math_inline_open', 'math', 1);
-  token.markup = String.fromCharCode(marker).repeat(2);
+  token.markup = repeat(String.fromCharCode(marker), 2);
 
   token = state.push('math', '', 0);
   token.content = state.src.slice(state.pos, state.posMax);
 
-  token = state.push('math_inline_close,', 'math', -1);
-  token.markup = String.fromCharCode(marker).repeat(2);
+  token = state.push('math_inline_close', 'math', -1);
+  token.markup = repeat(String.fromCharCode(marker), 2);
 
   state.pos = state.posMax + 2;
   state.posMax = max;
@@ -1440,5 +1509,5 @@ module.exports = function math_plugin(md, renderer) {
   md.renderer.rules.math = mathRenderer;
 };
 
-},{"./lib/polyfills":1,"ascii2mathml":2}]},{},[6])(6)
+},{"./lib/polyfills":1,"ascii2mathml":2,"repeat-string":6}]},{},[7])(7)
 });
