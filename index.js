@@ -2,6 +2,7 @@
 
 'use strict';
 
+var repeat = require('repeat-string');
 require('./lib/polyfills');
 
 
@@ -116,13 +117,13 @@ function math_inline(state, silent) {
 
   // Earlier we checked !silent, but this implementation does not need it
   token = state.push('math_inline_open', 'math', 1);
-  token.markup = String.fromCharCode(marker).repeat(2);
+  token.markup = repeat(String.fromCharCode(marker), 2);
 
   token = state.push('math', '', 0);
   token.content = state.src.slice(state.pos, state.posMax);
 
   token = state.push('math_inline_close', 'math', -1);
-  token.markup = String.fromCharCode(marker).repeat(2);
+  token.markup = repeat(String.fromCharCode(marker), 2);
 
   state.pos = state.posMax + 2;
   state.posMax = max;
