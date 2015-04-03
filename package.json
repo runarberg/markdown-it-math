@@ -44,6 +44,7 @@
     "eslint-plugin-nodeca": "^1.0.3",
     "markdown-it": "^4.1.0",
     "markdown-it-testgen": "^0.1.4",
+    "mocha": "^2.2.1",
     "texzilla": "^0.9.9",
     "uglifyjs": "^2.4.10"
   }
