@@ -40,6 +40,7 @@
   "devDependencies": {
     "babelify": "^5.0.4",
     "browserify": "^9.0.4",
+    "eslint": "^0.18.0",
     "eslint-plugin-nodeca": "^1.0.3",
     "markdown-it": "^4.1.0",
     "markdown-it-testgen": "^0.1.4",
