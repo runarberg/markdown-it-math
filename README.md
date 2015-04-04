@@ -1,7 +1,7 @@
 markdown-it-math
 ================
 
-[![npm version](https://badge.fury.io/js/markdown-it-math.svg)](http://badge.fury.io/js/markdown-it-math)
+[![npm](https://img.shields.io/npm/v/markdown-it-math.svg)](https://www.npmjs.com/package/markdown-it-math)
 [![Build Status](https://travis-ci.org/runarberg/markdown-it-math.svg?branch=master)](https://travis-ci.org/runarberg/markdown-it-math)
 
 ```md
@@ -65,5 +65,5 @@ var md = require('markdown-it')()
         });
 
 md.render("$$\\sin(2\\pi)$$");
-// <semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π;</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics>
+// <p><math><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
 ```
