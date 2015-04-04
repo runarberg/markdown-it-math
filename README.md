@@ -1,6 +1,9 @@
 markdown-it-math
 ================
 
+[![npm version](https://badge.fury.io/js/markdown-it-math.svg)](http://badge.fury.io/js/markdown-it-math)
+[![Build Status](https://travis-ci.org/runarberg/markdown-it-math.svg?branch=master)](https://travis-ci.org/runarberg/markdown-it-math)
+
 ```md
 Pythagoran theorem is $$a^2 + b^2 = c^2$$.
 
