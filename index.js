@@ -6,6 +6,11 @@ var repeat = require('repeat-string');
 require('./lib/polyfills');
 
 
+// The number of '$' characters required for the inline delimiter.
+var requiredInlineDelimsCount;
+var REQUIRED_INLINE_DELIMS_COUNT_DEFAULT = 2;
+
+
 function scanDelims(state, start) {
   var pos = start, lastChar, nextChar, count,
       isLastWhiteSpace, isLastPunctChar,
@@ -77,7 +82,7 @@ function math_inline(state, silent) {
     return true;
   }
 
-  stack = Math.floor(startCount / 2);
+  stack = Math.floor(startCount / requiredInlineDelimsCount);
   if (stack <= 0) { return false; }
   state.pos = start + startCount;
 
@@ -85,10 +90,10 @@ function math_inline(state, silent) {
     if (state.src.charCodeAt(state.pos) === marker) {
       res = scanDelims(state, state.pos);
       count = res.delims;
-      tagCount = Math.floor(count / 2);
+      tagCount = Math.floor(count / requiredInlineDelimsCount);
       if (res.can_close) {
         if (tagCount >= stack) {
-          state.pos += count - 2;
+          state.pos += count - requiredInlineDelimsCount;
           found = true;
           break;
         }
@@ -113,19 +118,19 @@ function math_inline(state, silent) {
 
   // Found!
   state.posMax = state.pos;
-  state.pos = start + 2;
+  state.pos = start + requiredInlineDelimsCount;
 
   // Earlier we checked !silent, but this implementation does not need it
   token = state.push('math_inline_open', 'math', 1);
-  token.markup = repeat(String.fromCharCode(marker), 2);
+  token.markup = repeat(String.fromCharCode(marker), requiredInlineDelimsCount);
 
   token = state.push('math', '', 0);
   token.content = state.src.slice(state.pos, state.posMax);
 
   token = state.push('math_inline_close', 'math', -1);
-  token.markup = repeat(String.fromCharCode(marker), 2);
+  token.markup = repeat(String.fromCharCode(marker), requiredInlineDelimsCount);
 
-  state.pos = state.posMax + 2;
+  state.pos = state.posMax + requiredInlineDelimsCount;
   state.posMax = max;
 
   return true;
@@ -234,14 +239,24 @@ function makeMathRenderer(options) {
 }
 
 
-module.exports = function math_plugin(md, renderer) {
+module.exports = function math_plugin(md, options, renderer) {
   var mathRenderer;
-  if (typeof renderer !== 'function') {
-    mathRenderer = makeMathRenderer(renderer);
-  } else {
+
+  requiredInlineDelimsCount = REQUIRED_INLINE_DELIMS_COUNT_DEFAULT;
+
+  if (typeof options === 'function') {
+    renderer = options;
+    options = null;
+  } else if (options) {
+    requiredInlineDelimsCount = options.requiredInlineDelimsCount || REQUIRED_INLINE_DELIMS_COUNT_DEFAULT;
+  }
+
+  if (renderer) {
     mathRenderer = function(tokens, idx) {
       return renderer(tokens[idx].content);
     };
+  } else {
+    mathRenderer = makeMathRenderer(options);
   }
 
   md.inline.ruler.before('emphasis', 'math_inline', math_inline);

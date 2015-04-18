@@ -13,6 +13,24 @@ describe("Options", function() {
     var res2 = md.render("$$$\n40,2\n$$$");
     assert.equal(res2, '<math display="block">\n<mn>40,2</mn></math>\n');
   });
+
+  it('Should allow customization of inline delimiter length', function() {
+    var md = require('markdown-it')()
+          .use(require('../'), {requiredInlineDelimsCount: 1});
+
+    var res1 = md.render("$x$");
+    assert.equal(res1, '<p><math><mi>x</mi></math></p>\n');
+
+    md = require('markdown-it')()
+          .use(require('../'), {requiredInlineDelimsCount: 5});
+
+    var res2 = md.render("$$$$$x$$$$$");
+    assert.equal(res2, '<p><math><mi>x</mi></math></p>\n');
+
+    // And should not render a shorter delimiter
+    var res3 = md.render("$$$$x$$$$");
+    assert.equal(res3, '<p>$$$$x$$$$</p>\n');
+  });
 });
 
 describe("Renderer", function() {
