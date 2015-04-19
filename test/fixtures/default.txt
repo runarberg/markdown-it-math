@@ -2,6 +2,7 @@
 Simple inline math
 .
 $$1+1 = 2$$
+
 .
 <p><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>
 .
@@ -13,8 +14,7 @@ $$$
 1+1 = 2
 $$$
 .
-<math display="block">
-<mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
 .
 
 
@@ -72,8 +72,7 @@ $$$
 bar
 .
 <p>foo</p>
-<math display="block">
-<mn>1</mn><mo>·</mo><mi>i</mi><mo>·</mo><mn>1</mn></math>
+<math display="block"><mn>1</mn><mo>·</mo><mi>i</mi><mo>·</mo><mn>1</mn></math>
 <p>bar</p>
 .
 
@@ -84,8 +83,7 @@ Block math can be indented up to 3 spaces
    1+1 = 2
    $$$
 .
-<math display="block">
-<mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
 .
 
 
@@ -122,8 +120,7 @@ $$$
 
 $$$
 .
-<math display="block">
-<mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></math>
+<math display="block"><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></math>
 .
 
 
@@ -138,8 +135,7 @@ $$$
 = 3
 $$$
 .
-<math display="block">
-<mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>3</mn></math>
+<math display="block"><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>3</mn></math>
 .
 
 
@@ -156,8 +152,7 @@ Display math self-closes at the end of document
 $$$
 1+1 = 2
 .
-<math display="block">
-<mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
 .
 
 
@@ -171,8 +166,7 @@ Display and inline math can appear in lists
 <ul>
 <li><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></li>
 <li>
-<math display="block">
-<mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
 </li>
 </ul>
 .

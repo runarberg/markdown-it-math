@@ -17,8 +17,7 @@ $$$
 ```html
 <p>Pythagoran theorem is <math><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><msup><mi>c</mi><mn>2</mn></msup></math>.</p>
 <p>Bayes theorem:</p>
-<math display="block">
-<mi>P</mi><mfenced open="(" close=")"><mrow><mi>A</mi><mo stretchy="true" lspace="veryverythickmathspace" rspace="veryverythickmathspace">|</mo><mi>B</mi></mrow></mfenced><mo>=</mo><mfrac><mrow><mi>P</mi><mfenced open="(" close=")"><mrow><mi>B</mi><mo stretchy="true" lspace="veryverythickmathspace" rspace="veryverythickmathspace">|</mo><mi>A</mi></mrow></mfenced><mi>P</mi><mfenced open="(" close=")"><mi>A</mi></mfenced></mrow><mrow><mi>P</mi><mfenced open="(" close=")"><mi>B</mi></mfenced></mrow></mfrac></math>
+<math display="block"><mi>P</mi><mfenced open="(" close=")"><mrow><mi>A</mi><mo stretchy="true" lspace="veryverythickmathspace" rspace="veryverythickmathspace">|</mo><mi>B</mi></mrow></mfenced><mo>=</mo><mfrac><mrow><mi>P</mi><mfenced open="(" close=")"><mrow><mi>B</mi><mo stretchy="true" lspace="veryverythickmathspace" rspace="veryverythickmathspace">|</mo><mi>A</mi></mrow></mfenced><mi>P</mi><mfenced open="(" close=")"><mi>A</mi></mfenced></mrow><mrow><mi>P</mi><mfenced open="(" close=")"><mi>B</mi></mfenced></mrow></mfrac></math>
 ```
 
 Installation
@@ -31,14 +30,23 @@ npm install markdown-it-math --save
 Usage
 -----
 
-```js
+```javascript
 var md = require('markdown-it')()
-        .use(require('markdown-it-math') [, options | renderer]);
+        .use(require('markdown-it-math') [, options]);
 ```
 
-If renderer function is not provided, it will default to
-`require('ascii2mathml')(options)`
-[(see here for info)](http://runarberg.github.io/ascii2mathml/).
+where options can be (with defaults)
+
+```javascript
+var options = {
+    rendererOptions: {},
+    inlineRenderer: require('ascii2mathml')(this.rendererOptions),
+    blockRenderer: require('ascii2mathml')(Object.assign({ display: 'block' },
+                                                         this.rendererOptions))
+}
+```
+
+(See [ascii2mathml](http://runarberg.github.io/ascii2mathml/) for reference).
 
 
 Examples
@@ -46,7 +54,7 @@ Examples
 
 Using comma as a decimal mark
 
-```js
+```javascript
 var md = require('markdown-it')()
         .use(require('markdown-it-math'), {decimalMark: ','});
 
@@ -56,14 +64,18 @@ md.render("$$40,2$$");
 
 Using [TeXZilla](http://fred-wang.github.io/TeXZilla/) as renderer
 
-```js
+```javascript
 var texzilla = require('texzilla');
 var md = require('markdown-it')()
-        .use(require('markdown-it-math'), function(str) {
-            // We need to strip the root math element out
-            return texzilla.toMathMLString(str).slice(49, -7);
+        .use(require('../'), {
+            inlineRenderer: function(str) {
+                return texzilla.toMathMLString(str);
+            },
+            blockRenderer: function(str) {
+                return texzilla.toMathMLString(str, true);
+            }
         });
 
 md.render("$$\\sin(2\\pi)$$");
-// <p><math><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
+// <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
 ```

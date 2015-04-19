@@ -2,7 +2,8 @@
 
 'use strict';
 
-var repeat = require('repeat-string');
+var repeat = require('repeat-string'),
+    ascii2mathml = require('ascii2mathml');
 require('./lib/polyfills');
 
 
@@ -116,13 +117,8 @@ function math_inline(state, silent) {
   state.pos = start + 2;
 
   // Earlier we checked !silent, but this implementation does not need it
-  token = state.push('math_inline_open', 'math', 1);
-  token.markup = repeat(String.fromCharCode(marker), 2);
-
-  token = state.push('math', '', 0);
+  token = state.push('math_inline', 'math', 0);
   token.content = state.src.slice(state.pos, state.posMax);
-
-  token = state.push('math_inline_close', 'math', -1);
   token.markup = repeat(String.fromCharCode(marker), 2);
 
   state.pos = state.posMax + 2;
@@ -207,44 +203,48 @@ function math_block(state, startLine, endLine, silent) {
 
   state.line = nextLine + (haveEndMarker ? 1 : 0);
 
-  token = state.push('math_block_open', 'math', 1);
-  token.attrPush([ 'display', 'block' ]);
-  token.markup = markup;
+  token = state.push('math_block', 'math', 0);
   token.block = true;
+  token.content = state.getLines(startLine + 1, nextLine, len, true);
   token.info = params;
   token.map = [ startLine, state.line ];
-
-  token = state.push('math', '', 0);
-  token.content = state.getLines(startLine + 1, nextLine, len, true);
-
-  token = state.push('math_block_close', 'math', -1);
   token.markup = markup;
-  token.block = true;
 
   return true;
 }
 
 
 function makeMathRenderer(options) {
-  var mathml = require('ascii2mathml')(Object.assign({ bare: true }, options));
+  var mathml = ascii2mathml(Object.assign({}, options));
 
-  return function(tokens, idx) {
-    return mathml(tokens[idx].content);
-  };
+  return (options && options.display === 'block') ?
+    function(tokens, idx) {
+      return mathml(tokens[idx].content) + '\n';
+    } :
+    function(tokens, idx) {
+      return mathml(tokens[idx].content);
+    };
 }
 
 
-module.exports = function math_plugin(md, renderer) {
-  var mathRenderer;
-  if (typeof renderer !== 'function') {
-    mathRenderer = makeMathRenderer(renderer);
-  } else {
-    mathRenderer = function(tokens, idx) {
-      return renderer(tokens[idx].content);
-    };
-  }
+module.exports = function math_plugin(md, options) {
+  // Default options
+  options = typeof options === 'object' ? options : {};
+  var inlineRenderer = options.inlineRenderer ?
+        function(tokens, idx) {
+          return options.inlineRenderer(tokens[idx].content);
+        } :
+      makeMathRenderer(options.renderingOptions);
+  var blockRenderer = options.blockRenderer ?
+        function(tokens, idx) {
+          return options.blockRenderer(tokens[idx].content) + '\n';
+        } :
+      makeMathRenderer(Object.assign({ display: 'block' },
+                                     options.renderingOptions));
+
 
   md.inline.ruler.before('emphasis', 'math_inline', math_inline);
   md.block.ruler.after('blockquote', 'math_block', math_block);
-  md.renderer.rules.math = mathRenderer;
+  md.renderer.rules.math_inline = inlineRenderer;
+  md.renderer.rules.math_block = blockRenderer;
 };
