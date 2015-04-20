@@ -2,8 +2,7 @@
 
 'use strict';
 
-var repeat = require('repeat-string'),
-    ascii2mathml = require('ascii2mathml');
+var ascii2mathml = require('ascii2mathml');
 require('./lib/polyfills');
 
 
@@ -54,10 +53,7 @@ function scanDelims(state, start) {
 function makeMath_inline(open, close) {
   return function math_inline(state, silent) {
     var startCount,
-        count,
-        tagCount,
         found,
-        stack,
         res,
         token,
         closeDelim,
@@ -68,7 +64,7 @@ function makeMath_inline(open, close) {
     if (openDelim !== open) { return false; }
     if (silent) { return false; }    // Don’t run any pairs in validation mode
 
-    res = scanDelims(state, start+open.length);
+    res = scanDelims(state, start + open.length);
     startCount = res.delims;
 
     if (!res.can_open) {
@@ -117,7 +113,7 @@ function makeMath_inline(open, close) {
 
 function makeMath_block(open, close) {
   return function math_block(state, startLine, endLine, silent) {
-    var openDelim, closeDelim, len, params, nextLine, mem, token, markup,
+    var openDelim, len, params, nextLine, token,
         haveEndMarker = false,
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
@@ -142,7 +138,7 @@ function makeMath_block(open, close) {
         break;
       }
 
-      pos = mem = state.bMarks[nextLine] + state.tShift[nextLine];
+      pos = state.bMarks[nextLine] + state.tShift[nextLine];
       max = state.eMarks[nextLine];
 
       if (pos < max && state.tShift[nextLine] < state.blkIndent) {
@@ -178,7 +174,7 @@ function makeMath_block(open, close) {
     token.content = state.getLines(startLine + 1, nextLine, len, true);
     token.info = params;
     token.map = [ startLine, state.line ];
-    token.markup = markup;
+    token.markup = open;
 
     return true;
   };
@@ -200,10 +196,10 @@ function makeMathRenderer(options) {
 module.exports = function math_plugin(md, options) {
   // Default options
   options = typeof options === 'object' ? options : {};
-  var inlineOpen = options.inlineOpen || "$$",
-      inlineClose = options.inlineClose || "$$",
-      blockOpen = options.blockOpen || "$$$",
-      blockClose = options.blockClose || "$$$";
+  var inlineOpen = options.inlineOpen || '$$',
+      inlineClose = options.inlineClose || '$$',
+      blockOpen = options.blockOpen || '$$$',
+      blockClose = options.blockClose || '$$$';
   var inlineRenderer = options.inlineRenderer ?
         function(tokens, idx) {
           return options.inlineRenderer(tokens[idx].content);
