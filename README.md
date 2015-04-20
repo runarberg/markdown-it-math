@@ -40,7 +40,7 @@ where options can be (with defaults)
 ```javascript
 var options = {
     inlineOpen: '$$',
-    inlineClose: '$$,
+    inlineClose: '$$',
     blockOpen: '$$$',
     blockClose: '$$$',
     rendererOptions: {},
