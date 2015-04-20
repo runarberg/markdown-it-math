@@ -39,6 +39,10 @@ where options can be (with defaults)
 
 ```javascript
 var options = {
+    inlineOpen: '$$',
+    inlineClose: '$$,
+    blockOpen: '$$$',
+    blockClose: '$$$',
     rendererOptions: {},
     inlineRenderer: require('ascii2mathml')(this.rendererOptions),
     blockRenderer: require('ascii2mathml')(Object.assign({ display: 'block' },
@@ -46,7 +50,7 @@ var options = {
 }
 ```
 
-(See [ascii2mathml](http://runarberg.github.io/ascii2mathml/) for reference).
+(See [ascii2mathml](http://runarberg.github.io/ascii2mathml/) for reference about the default renderer).
 
 
 Examples
@@ -67,7 +71,7 @@ Using [TeXZilla](http://fred-wang.github.io/TeXZilla/) as renderer
 ```javascript
 var texzilla = require('texzilla');
 var md = require('markdown-it')()
-        .use(require('../'), {
+        .use(require('markdown-it-math'), {
             inlineRenderer: function(str) {
                 return texzilla.toMathMLString(str);
             },
@@ -79,3 +83,32 @@ var md = require('markdown-it')()
 md.render("$$\\sin(2\\pi)$$");
 // <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
 ```
+
+Using LaTeX style delimiters
+
+```javascript
+var md = require('markdown-it')()
+        .use(require('markdown-it-math'), {
+            inlineOpen: '\\(',
+            inlineClose: '\\)',
+            blockOpen: '\\[',
+            blockClose: '\\]'
+        })
+```
+
+Note there are restrictions on what inline delimiters you can use,
+based on optimization for the markdown-it parser
+[see here for details][1]. And block level math must be on its own
+lines with newlines separating the math from the delimiters.
+
+```markdown
+Some text with inline math \(a^2 + b^2 = c^2\)
+
+And block math
+
+\[
+e = sum_(n=0)^oo 1/n!
+\]
+```
+
+[1]: https://github.com/markdown-it/markdown-it/blob/master/docs/development.md#why-my-inline-rule-is-not-executed

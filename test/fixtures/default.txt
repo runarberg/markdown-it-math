@@ -18,15 +18,15 @@ $$$
 .
 
 
-No like other inline markup, no whitespace surrounding $$
+unlike other inline markup, whitespace surrounding delimeters is fine
 .
 foo $$ 1+1 = 2 $$ bar
 .
-<p>foo $$ 1+1 = 2 $$ bar</p>
+<p>foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>
 .
 
 
-But no whitespace before and after is fine
+No whitespace before and after is also fine
 .
 foo$$1+1 = 2$$bar
 .
