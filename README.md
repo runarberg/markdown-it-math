@@ -43,10 +43,10 @@ var options = {
     inlineClose: '$$',
     blockOpen: '$$$',
     blockClose: '$$$',
-    rendererOptions: {},
+    renderingOptions: {},
     inlineRenderer: require('ascii2mathml')(this.rendererOptions),
     blockRenderer: require('ascii2mathml')(Object.assign({ display: 'block' },
-                                                         this.rendererOptions))
+                                                         this.renderingOptions))
 }
 ```
 
@@ -60,7 +60,9 @@ Using comma as a decimal mark
 
 ```javascript
 var md = require('markdown-it')()
-        .use(require('markdown-it-math'), {decimalMark: ','});
+        .use(require('markdown-it-math'), {
+            renderingOptions: { decimalMark: ',' }
+        });
 
 md.render("$$40,2$$");
 // <p><math><mn>40,2</mn></math></p>

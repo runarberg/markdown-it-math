@@ -33,7 +33,7 @@ describe('Options', function() {
   });
 });
 
-describe("Renderer options", function() {
+describe("Rendering options", function() {
   it('Should allow different options', function() {
     var md = require('markdown-it')()
           .use(require('../'), {
