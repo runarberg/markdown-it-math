@@ -6,42 +6,56 @@ var ascii2mathml = require('ascii2mathml');
 require('./lib/polyfills');
 
 
-function scanDelims(state, start) {
-  var pos = state.pos, lastChar, nextChar, count,
+function scanDelims(state, start, delimLength) {
+  var pos = start, lastChar, nextChar, count, can_open, can_close,
       isLastWhiteSpace, isLastPunctChar,
       isNextWhiteSpace, isNextPunctChar,
-      can_open = true,
-      can_close = true,
+      left_flanking = true,
+      right_flanking = true,
       max = state.posMax,
       isWhiteSpace = state.md.utils.isWhiteSpace,
       isPunctChar = state.md.utils.isPunctChar,
       isMdAsciiPunct = state.md.utils.isMdAsciiPunct;
+
   // treat beginning of the line as a whitespace
   lastChar = start > 0 ? state.src.charCodeAt(start - 1) : 0x20;
+
   if (pos >= max) {
     can_open = false;
   }
+
+  pos += delimLength;
+
   count = pos - start;
+
   // treat end of the line as a whitespace
   nextChar = pos < max ? state.src.charCodeAt(pos) : 0x20;
+
   isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar));
   isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar));
+
   isLastWhiteSpace = isWhiteSpace(lastChar);
   isNextWhiteSpace = isWhiteSpace(nextChar);
+
   if (isNextWhiteSpace) {
-    can_open = false;
+    left_flanking = false;
   } else if (isNextPunctChar) {
     if (!(isLastWhiteSpace || isLastPunctChar)) {
-      can_open = false;
+      left_flanking = false;
     }
   }
+
   if (isLastWhiteSpace) {
-    can_close = false;
+    right_flanking = false;
   } else if (isLastPunctChar) {
     if (!(isNextWhiteSpace || isNextPunctChar)) {
-      can_close = false;
+      right_flanking = false;
     }
   }
+
+  can_open = left_flanking;
+  can_close = right_flanking;
+
   return {
     can_open: can_open,
     can_close: can_close,
@@ -64,7 +78,7 @@ function makeMath_inline(open, close) {
     if (openDelim !== open) { return false; }
     if (silent) { return false; }    // Don’t run any pairs in validation mode
 
-    res = scanDelims(state, start + open.length);
+    res = scanDelims(state, start, openDelim.length);
     startCount = res.delims;
 
     if (!res.can_open) {
@@ -79,7 +93,7 @@ function makeMath_inline(open, close) {
     while (state.pos < max) {
       closeDelim = state.src.slice(state.pos, state.pos + close.length);
       if (closeDelim === close) {
-        res = scanDelims(state, state.pos + close.length);
+        res = scanDelims(state, state.pos, close.length);
         if (res.can_close) {
           found = true;
           break;
