@@ -34,6 +34,20 @@ foo$$1+1 = 2$$bar
 .
 
 
+Paragraph breaks are unnecessary before and after display math
+.
+foo
+$$$
+x + y
+$$$
+bar
+.
+<p>foo</p>
+<math display="block"><mi>x</mi><mo>+</mo><mi>y</mi></math>
+<p>bar</p>
+.
+
+
 Paragraph break in inline math is not allowed
 .
 foo $$1+1
