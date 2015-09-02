@@ -159,12 +159,13 @@ function makeMath_block(open, close) {
       pos = state.skipSpaces(pos);
 
       if (pos < max) { continue; }
+
       haveEndMarker = true;
       // found!
       break;
     }
 
-    // If math block has heading spaces, the should be removed from its inner block
+    // If math block has heading spaces, they should be removed from its inner block
     len = state.tShift[startLine];
 
     state.line = nextLine + (haveEndMarker ? 1 : 0);
@@ -183,7 +184,7 @@ function makeMath_block(open, close) {
 function makeMathRenderer(options) {
   var mathml = ascii2mathml(Object.assign({}, options));
 
-  return (options && options.display === 'block') ?
+  return options && options.display === 'block' ?
     function(tokens, idx) {
       return mathml(tokens[idx].content) + '\n';
     } :
