@@ -1,4 +1,4 @@
-/*! markdown-it-math 2.0.1 https://github.com/runarberg/markdown-it-math @license MIT */
+/*! markdown-it-math 3.0.0 https://github.com/runarberg/markdown-it-math @license MIT */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.markdownitMath = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -5692,42 +5692,56 @@ var ascii2mathml = require('ascii2mathml');
 require('./lib/polyfills');
 
 
-function scanDelims(state, start) {
-  var pos = state.pos, lastChar, nextChar, count,
+function scanDelims(state, start, delimLength) {
+  var pos = start, lastChar, nextChar, count, can_open, can_close,
       isLastWhiteSpace, isLastPunctChar,
       isNextWhiteSpace, isNextPunctChar,
-      can_open = true,
-      can_close = true,
+      left_flanking = true,
+      right_flanking = true,
       max = state.posMax,
       isWhiteSpace = state.md.utils.isWhiteSpace,
       isPunctChar = state.md.utils.isPunctChar,
       isMdAsciiPunct = state.md.utils.isMdAsciiPunct;
+
   // treat beginning of the line as a whitespace
   lastChar = start > 0 ? state.src.charCodeAt(start - 1) : 0x20;
+
   if (pos >= max) {
     can_open = false;
   }
+
+  pos += delimLength;
+
   count = pos - start;
+
   // treat end of the line as a whitespace
   nextChar = pos < max ? state.src.charCodeAt(pos) : 0x20;
+
   isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar));
   isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar));
+
   isLastWhiteSpace = isWhiteSpace(lastChar);
   isNextWhiteSpace = isWhiteSpace(nextChar);
+
   if (isNextWhiteSpace) {
-    can_open = false;
+    left_flanking = false;
   } else if (isNextPunctChar) {
     if (!(isLastWhiteSpace || isLastPunctChar)) {
-      can_open = false;
+      left_flanking = false;
     }
   }
+
   if (isLastWhiteSpace) {
-    can_close = false;
+    right_flanking = false;
   } else if (isLastPunctChar) {
     if (!(isNextWhiteSpace || isNextPunctChar)) {
-      can_close = false;
+      right_flanking = false;
     }
   }
+
+  can_open = left_flanking;
+  can_close = right_flanking;
+
   return {
     can_open: can_open,
     can_close: can_close,
@@ -5750,7 +5764,7 @@ function makeMath_inline(open, close) {
     if (openDelim !== open) { return false; }
     if (silent) { return false; }    // Don’t run any pairs in validation mode
 
-    res = scanDelims(state, start + open.length);
+    res = scanDelims(state, start, openDelim.length);
     startCount = res.delims;
 
     if (!res.can_open) {
@@ -5765,7 +5779,7 @@ function makeMath_inline(open, close) {
     while (state.pos < max) {
       closeDelim = state.src.slice(state.pos, state.pos + close.length);
       if (closeDelim === close) {
-        res = scanDelims(state, state.pos + close.length);
+        res = scanDelims(state, state.pos, close.length);
         if (res.can_close) {
           found = true;
           break;
@@ -5799,7 +5813,7 @@ function makeMath_inline(open, close) {
 
 function makeMath_block(open, close) {
   return function math_block(state, startLine, endLine, silent) {
-    var openDelim, len, params, nextLine, token,
+    var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
@@ -5810,14 +5824,26 @@ function makeMath_block(open, close) {
 
     if (openDelim !== open) { return false; }
 
+    pos += open.length;
+    firstLine = state.src.slice(pos, max);
+
     // Since start is found, we can report success here in validation mode
     if (silent) { return true; }
+
+    if (firstLine.trim().slice(-close.length) === close) {
+      // Single line expression
+      firstLine = firstLine.trim().slice(0, -close.length);
+      haveEndMarker = true;
+    }
 
     // search end of block
     nextLine = startLine;
 
     for (;;) {
+      if (haveEndMarker) { break; }
+
       nextLine++;
+
       if (nextLine >= endLine) {
         // unclosed block should be autoclosed by end of document.
         // also block seems to be autoclosed by end of parent
@@ -5832,23 +5858,27 @@ function makeMath_block(open, close) {
         break;
       }
 
-      if (state.src.slice(pos, pos + close.length) !== close) { continue; }
+      if (state.src.slice(pos, max).trim().slice(-close.length) !== close) {
+        continue;
+      }
 
       if (state.tShift[nextLine] - state.blkIndent >= 4) {
         // closing block math should be indented less then 4 spaces
         continue;
       }
 
-      pos += close.length;
+      lastLinePos = state.src.slice(0, max).lastIndexOf(close);
+      lastLine = state.src.slice(pos, lastLinePos);
+
+      pos += lastLine.length + close.length;
 
       // make sure tail has spaces only
       pos = state.skipSpaces(pos);
 
       if (pos < max) { continue; }
 
-      haveEndMarker = true;
       // found!
-      break;
+      haveEndMarker = true;
     }
 
     // If math block has heading spaces, they should be removed from its inner block
@@ -5858,7 +5888,9 @@ function makeMath_block(open, close) {
 
     token = state.push('math_block', 'math', 0);
     token.block = true;
-    token.content = state.getLines(startLine + 1, nextLine, len, true);
+    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
+      state.getLines(startLine + 1, nextLine, len, true) +
+      (lastLine && lastLine.trim() ? lastLine : '');
     token.info = params;
     token.map = [ startLine, state.line ];
     token.markup = open;
