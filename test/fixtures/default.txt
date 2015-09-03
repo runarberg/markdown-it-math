@@ -193,3 +193,20 @@ Display and inline math can appear in lists
 </ul>
 .
 
+Display math can be written in one line
+.
+$$$1+1 = 2$$$
+.
+<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+.
+
+Escaped dollar signs should not render math
+.
+\$$1$$
+\$$$
+1
+.
+<p>$$1$$
+$$$
+1</p>
+.
