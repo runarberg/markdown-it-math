@@ -127,7 +127,7 @@ function makeMath_inline(open, close) {
 
 function makeMath_block(open, close) {
   return function math_block(state, startLine, endLine, silent) {
-    var openDelim, len, params, nextLine, token,
+    var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
@@ -138,14 +138,26 @@ function makeMath_block(open, close) {
 
     if (openDelim !== open) { return false; }
 
+    pos += open.length;
+    firstLine = state.src.slice(pos, max);
+
     // Since start is found, we can report success here in validation mode
     if (silent) { return true; }
+
+    if (firstLine.trim().slice(-close.length) === close) {
+      // Single line expression
+      firstLine = firstLine.trim().slice(0, -close.length);
+      haveEndMarker = true;
+    }
 
     // search end of block
     nextLine = startLine;
 
     for (;;) {
+      if (haveEndMarker) { break; }
+
       nextLine++;
+
       if (nextLine >= endLine) {
         // unclosed block should be autoclosed by end of document.
         // also block seems to be autoclosed by end of parent
@@ -160,23 +172,27 @@ function makeMath_block(open, close) {
         break;
       }
 
-      if (state.src.slice(pos, pos + close.length) !== close) { continue; }
+      if (state.src.slice(pos, max).trim().slice(-close.length) !== close) {
+        continue;
+      }
 
       if (state.tShift[nextLine] - state.blkIndent >= 4) {
         // closing block math should be indented less then 4 spaces
         continue;
       }
 
-      pos += close.length;
+      lastLinePos = state.src.slice(0, max).lastIndexOf(close);
+      lastLine = state.src.slice(pos, lastLinePos);
+
+      pos += lastLine.length + close.length;
 
       // make sure tail has spaces only
       pos = state.skipSpaces(pos);
 
       if (pos < max) { continue; }
 
-      haveEndMarker = true;
       // found!
-      break;
+      haveEndMarker = true;
     }
 
     // If math block has heading spaces, they should be removed from its inner block
@@ -186,7 +202,9 @@ function makeMath_block(open, close) {
 
     token = state.push('math_block', 'math', 0);
     token.block = true;
-    token.content = state.getLines(startLine + 1, nextLine, len, true);
+    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
+      state.getLines(startLine + 1, nextLine, len, true) +
+      (lastLine && lastLine.trim() ? lastLine : '');
     token.info = params;
     token.map = [ startLine, state.line ];
     token.markup = open;
