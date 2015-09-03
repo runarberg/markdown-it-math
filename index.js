@@ -2,7 +2,7 @@
 
 'use strict';
 
-var ascii2mathml = require('ascii2mathml');
+var ascii2mathml = null;
 require('./lib/polyfills');
 
 
@@ -214,6 +214,9 @@ function makeMath_block(open, close) {
 }
 
 function makeMathRenderer(options) {
+  if (ascii2mathml === null) {
+    ascii2mathml = require('ascii2mathml');
+  }
   var mathml = ascii2mathml(Object.assign({}, options));
 
   return options && options.display === 'block' ?
