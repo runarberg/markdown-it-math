@@ -3,7 +3,6 @@
     "node": true,
     "browser": false
   },
-  "plugins": ["nodeca"],
   "rules": {
     "array-bracket-spacing": [ 2, "always" ],
     "block-scoped-var": 2,
@@ -19,6 +18,7 @@
     "eqeqeq": 2,
     "guard-for-in": 2,
     "handle-callback-err": 2,
+    "indent": [ 2, 2, { "VariableDeclarator": { "var": 2, "let": 2, "const": 3 } } ],
     "max-depth": [ 1, 6 ],
     "max-nested-callbacks": [ 1, 4 ],
     "max-len": [ 2, 120, 1000 ],
@@ -107,6 +107,5 @@
     "use-isnan": 2,
     "yoda": 2,
     "valid-typeof": 2,
-    "nodeca/indent": [2, "spaces", 2]
   }
 }
