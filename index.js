@@ -213,13 +213,24 @@ function makeMath_block(open, close) {
   };
 }
 
-function makeMathRenderer(options) {
+function makeMathRenderer(renderingOptions) {
   if (ascii2mathml === null) {
-    ascii2mathml = require('ascii2mathml');
+    try {
+      ascii2mathml = require('ascii2mathml');
+    } catch (e) {
+      return renderingOptions && renderingOptions.display === 'block' ?
+        function(tokens, idx) {
+          return '<div class="math block">' + tokens[idx].content + '</div>';
+        } :
+        function(tokens, idx) {
+          return '<span class="math inline">' + tokens[idx].content + '</span>';
+        };
+    }
   }
-  var mathml = ascii2mathml(Object.assign({}, options));
 
-  return options && options.display === 'block' ?
+  var mathml = ascii2mathml(Object.assign({}, renderingOptions));
+
+  return renderingOptions && renderingOptions.display === 'block' ?
     function(tokens, idx) {
       return mathml(tokens[idx].content) + '\n';
     } :
