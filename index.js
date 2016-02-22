@@ -3,7 +3,6 @@
 'use strict';
 var prefix = 'mathjax-';
 var divIndex = 0;
-var ascii2mathml = null;
 require('./lib/polyfills');
 
 
@@ -215,30 +214,14 @@ function makeMath_block(open, close) {
 }
 
 function makeMathRenderer(renderingOptions) {
-  if (ascii2mathml === null) {
-    try {
-      ascii2mathml = require('ascii2mathml');
-    } catch (e) {
-      return renderingOptions && renderingOptions.display === 'block' ?
-        function(tokens, idx) {
-          return '<div id=' + prefix + divIndex++ + renderingOptions.suffix +
-           '" class="math block">' + tokens[idx].content + '</div>';
-        } :
-        function(tokens, idx) {
-          return '<span id=' + prefix + divIndex++ + renderingOptions.suffix +
-           '" class="math inline">' + tokens[idx].content + '</span>';
-        };
-    }
-  }
-
-  var mathml = ascii2mathml(Object.assign({}, renderingOptions));
-
   return renderingOptions && renderingOptions.display === 'block' ?
     function(tokens, idx) {
-      return mathml(tokens[idx].content) + '\n';
+      return '<div id=' + prefix + divIndex++ + renderingOptions.suffix +
+       '" class="math block">' + tokens[idx].content + '</div>';
     } :
     function(tokens, idx) {
-      return mathml(tokens[idx].content);
+      return '<span id=' + prefix + divIndex++ + renderingOptions.suffix +
+       '" class="math inline">' + tokens[idx].content + '</span>';
     };
 }
 
@@ -250,16 +233,8 @@ module.exports = function math_plugin(md, options) {
       inlineClose = options.inlineClose || '$$',
       blockOpen = options.blockOpen || '$$$',
       blockClose = options.blockClose || '$$$';
-  var inlineRenderer = options.inlineRenderer ?
-        function(tokens, idx) {
-          return options.inlineRenderer(tokens[idx].content);
-        } :
-      makeMathRenderer(options.renderingOptions);
-  var blockRenderer = options.blockRenderer ?
-        function(tokens, idx) {
-          return options.blockRenderer(tokens[idx].content) + '\n';
-        } :
-      makeMathRenderer(Object.assign({ display: 'block' },
+  var inlineRenderer = makeMathRenderer(options.renderingOptions);
+  var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
                                      options.renderingOptions));
 
   var math_inline = makeMath_inline(inlineOpen, inlineClose);
