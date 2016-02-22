@@ -1,7 +1,8 @@
 /* Process inline math */
 
 'use strict';
-
+var prefix = 'mathjax-';
+var divIndex = 0;
 var ascii2mathml = null;
 require('./lib/polyfills');
 
@@ -220,10 +221,12 @@ function makeMathRenderer(renderingOptions) {
     } catch (e) {
       return renderingOptions && renderingOptions.display === 'block' ?
         function(tokens, idx) {
-          return '<div class="math block">' + tokens[idx].content + '</div>';
+          return '<div id=' + prefix + divIndex++ + renderingOptions.suffix +
+           '" class="math block">' + tokens[idx].content + '</div>';
         } :
         function(tokens, idx) {
-          return '<span class="math inline">' + tokens[idx].content + '</span>';
+          return '<span id=' + prefix + divIndex++ + renderingOptions.suffix +
+           '" class="math inline">' + tokens[idx].content + '</span>';
         };
     }
   }
