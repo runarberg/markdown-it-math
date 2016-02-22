@@ -109,7 +109,7 @@ function scanDelims(state, start, delimLength) {
 }
 
 
-function makeMath_inline(open, close) {
+function makeMath_inline(open, close, suffix) {
   return function math_inline(state, silent) {
     var startCount,
         found,
@@ -162,6 +162,8 @@ function makeMath_inline(open, close) {
     token = state.push('math_inline', 'math', 0);
     token.content = state.src.slice(state.pos, state.posMax);
     token.markup = open;
+    token.attrs = [ [ 'id', prefix + divIndex++ + suffix ] ];
+
 
     state.pos = state.posMax + close.length;
     state.posMax = max;
@@ -170,7 +172,7 @@ function makeMath_inline(open, close) {
   };
 }
 
-function makeMath_block(open, close) {
+function makeMath_block(open, close, suffix) {
   return function math_block(state, startLine, endLine, silent) {
     var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
@@ -253,7 +255,7 @@ function makeMath_block(open, close) {
     token.info = params;
     token.map = [ startLine, state.line ];
     token.markup = open;
-
+    token.attrs = [ [ 'id', prefix + divIndex++ + suffix ] ];
     return true;
   };
 }
@@ -282,8 +284,8 @@ module.exports = function math_plugin(md, options) {
   var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
                                      options.renderingOptions));
 
-  var math_inline = makeMath_inline(inlineOpen, inlineClose);
-  var math_block = makeMath_block(blockOpen, blockClose);
+  var math_inline = makeMath_inline(inlineOpen, inlineClose, options.renderingOptions.suffix);
+  var math_block = makeMath_block(blockOpen, blockClose, options.renderingOptions.suffix);
 
   md.inline.ruler.before('escape', 'math_inline', math_inline);
   md.block.ruler.after('blockquote', 'math_block', math_block, {
