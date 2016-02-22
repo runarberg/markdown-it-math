@@ -64,7 +64,7 @@ function scanDelims(state, start, delimLength) {
 }
 
 
-function makeMath_inline(open, close, suffix) {
+function makeMath_inline(open, close) {
   return function math_inline(state, silent) {
     var startCount,
         found,
@@ -115,7 +115,6 @@ function makeMath_inline(open, close, suffix) {
 
     // Earlier we checked !silent, but this implementation does not need it
     token = state.push('math_inline', 'math', 0);
-    token.attrs = [ [ 'id', prefix + divIndex++ + suffix ] ];
     token.content = state.src.slice(state.pos, state.posMax);
     token.markup = open;
 
@@ -127,7 +126,7 @@ function makeMath_inline(open, close, suffix) {
   };
 }
 
-function makeMath_block(open, close, suffix) {
+function makeMath_block(open, close) {
   return function math_block(state, startLine, endLine, silent) {
     var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
@@ -203,7 +202,6 @@ function makeMath_block(open, close, suffix) {
     state.line = nextLine + (haveEndMarker ? 1 : 0);
 
     token = state.push('math_block', 'math', 0);
-    token.attrs = [ [ 'id', prefix + divIndex++ + suffix ] ];
     token.block = true;
     token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
       state.getLines(startLine + 1, nextLine, len, true) +
@@ -235,13 +233,10 @@ module.exports = function math_plugin(md, options) {
       inlineClose = options.inlineClose || '$$',
       blockOpen = options.blockOpen || '$$$',
       blockClose = options.blockClose || '$$$',
-      suffix = options.suffix || 'suffix';
+      suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
                                      options.renderingOptions), suffix);
-
-  // var math_inline = makeMath_inline(inlineOpen, inlineClose, options.renderingOptions.suffix);
-  // var math_block = makeMath_block(blockOpen, blockClose, options.renderingOptions.suffix);
 
   var math_inline = makeMath_inline(inlineOpen, inlineClose, suffix);
   var math_block = makeMath_block(blockOpen, blockClose, suffix);

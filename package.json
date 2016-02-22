@@ -8,7 +8,6 @@
   },
   "scripts": {
     "browserify": "(echo \"/*! ${npm_package_name} ${npm_package_version} ${npm_package_homepage} @license MIT */\"; browserify ./ -s markdownitMath) > dist/markdown-it-math.js",
-    "predist": "npm run test",
     "dist": "rm -fr dist; mkdir dist; npm run browserify; npm run minify",
     "lint": "eslint index.js lib/",
     "minify": "uglifyjs dist/markdown-it-math.js -b beautify=false,ascii-only=true -c -m --preamble \"/*! ${npm_package_name} ${npm_package_version} ${npm_package_homepage} @license MIT */\" > dist/markdown-it-math.min.js",
