@@ -214,15 +214,16 @@ function makeMath_block(open, close) {
 }
 
 function makeMathRenderer(renderingOptions, suffix) {
-  return renderingOptions && renderingOptions.display === 'block' ?
-    function(tokens, idx) {
-      return '<div id="' + prefix + divIndex++ + suffix +
-       '" class="math block text-center">' + tokens[idx].content + '</div>';
-    } :
-    function(tokens, idx) {
+  return function(tokens, idx) {
       return '<span id="' + prefix + divIndex++ + suffix +
        '" class="math inline">' + tokens[idx].content + '</span>';
     };
+  // renderingOptions && renderingOptions.display === 'block' ?
+  //   function(tokens, idx) {
+  //     return '<div id="' + prefix + divIndex++ + suffix +
+  //      '" class="math block text-center">' + tokens[idx].content + '</div>';
+  //   } :
+    
 }
 
 
@@ -232,12 +233,12 @@ module.exports = function math_plugin(md, options) {
   options = typeof options === 'object' ? options : {};
   var inlineOpen = options.inlineOpen || '$$',
       inlineClose = options.inlineClose || '$$',
-      blockOpen = options.blockOpen || '\n&&\n',
-      blockClose = options.blockClose || '\n&&\n',
+      blockOpen = options.blockOpen || 'blockOpen',
+      blockClose = options.blockClose || 'blockClose',
       suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeMathRenderer(options.renderingOptions, suffix);
-  var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
-                                     options.renderingOptions), suffix);
+  // var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
+  //                                    options.renderingOptions), suffix);
 
   var math_inline = makeMath_inline(inlineOpen, inlineClose, suffix);
   var math_block = makeMath_block(blockOpen, blockClose, suffix);
@@ -247,5 +248,5 @@ module.exports = function math_plugin(md, options) {
     alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
   });
   md.renderer.rules.math_inline = inlineRenderer;
-  md.renderer.rules.math_block = blockRenderer;
+  md.renderer.rules.math_block = inlineRenderer;
 };
