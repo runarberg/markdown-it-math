@@ -217,7 +217,7 @@ function makeMathRenderer(renderingOptions, suffix) {
   return renderingOptions && renderingOptions.display === 'block' ?
     function(tokens, idx) {
       return '<div id="' + prefix + divIndex++ + suffix +
-       '" class="math block">' + tokens[idx].content + '</div>';
+       '" class="math block text-center">' + tokens[idx].content + '</div>';
     } :
     function(tokens, idx) {
       return '<span id="' + prefix + divIndex++ + suffix +
@@ -231,8 +231,8 @@ module.exports = function math_plugin(md, options) {
   options = typeof options === 'object' ? options : {};
   var inlineOpen = options.inlineOpen || '$$',
       inlineClose = options.inlineClose || '$$',
-      blockOpen = options.blockOpen || '$$$',
-      blockClose = options.blockClose || '$$$',
+      blockOpen = options.blockOpen || '$$\n\\begin{aligned}\n',
+      blockClose = options.blockClose || '\n\\end{aligned}\n$$',
       suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
