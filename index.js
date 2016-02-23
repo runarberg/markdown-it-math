@@ -231,8 +231,8 @@ module.exports = function math_plugin(md, options) {
   options = typeof options === 'object' ? options : {};
   var inlineOpen = options.inlineOpen || '$$',
       inlineClose = options.inlineClose || '$$',
-      blockOpen = options.blockOpen || '$$\n\\begin{aligned}\n',
-      blockClose = options.blockClose || '\n\\end{aligned}\n$$',
+      blockOpen = options.blockOpen || '\n$$\n\\begin{aligned}\n',
+      blockClose = options.blockClose || '\n\\end{aligned}\n$$\n',
       suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
