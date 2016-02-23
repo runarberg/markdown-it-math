@@ -243,7 +243,7 @@ module.exports = function math_plugin(md, options) {
   var math_inline = makeMath_inline(inlineOpen, inlineClose, suffix);
   var math_block = makeMath_block(blockOpen, blockClose, suffix);
 
-  md.core.ruler.push('math_inline', math_inline);
+  md.block.ruler.before('blockquote', 'math_inline', math_inline);
   md.block.ruler.after('blockquote', 'math_block', math_block, {
     alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
   });
