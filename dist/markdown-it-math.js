@@ -178,11 +178,6 @@ function makeMath_block(open, close) {
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
 
-    // first try inline
-    if (makeMath_inline(open, close)({pos: pos, posMax: max, src: state.src, md: state.md}, silent)) {
-      return false;
-    }
-
     if (pos + open.length > max) { return false; }
 
     openDelim = state.src.slice(pos, pos + open.length);
