@@ -171,18 +171,27 @@ function makeMath_inline(open, close) {
   };
 }
 
-function makeMath_block(open, close) {
+function makeMath_block(openList, closeList) {
   return function math_block(state, startLine, endLine, silent) {
     var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
 
-    if (pos + open.length > max) { return false; }
+    var hasPossibleToken = false;
+    for (var i = 0; i < openList.length; i++) {
+      if (pos + openList[i].length <= max) { hasPossibleToken = true; }
+    }
 
+    if (!hasPossibleToken)
+      return false;
+
+    var open = '';
     openDelim = state.src.slice(pos, pos + open.length);
 
-    if (openDelim !== open) { return false; }
+    for (var i = 0; i < openList.length && open === ''; i++) {
+      if (openDelim === openList[i]) { open = openList[i]; }
+    }
 
     pos += open.length;
     firstLine = state.src.slice(pos, max);
@@ -291,8 +300,8 @@ module.exports = function math_plugin(md, options) {
   options = typeof options === 'object' ? options : {};
   var inlineOpen = options.inlineOpen || '$$',
       inlineClose = options.inlineClose || '$$',
-      blockOpen = options.blockOpen || 'blockOpen',
-      blockClose = options.blockClose || 'blockClose',
+      blockOpen = options.blockOpen || ['$$\n'],
+      blockClose = options.blockClose || ['\n$$'],
       suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeInlineMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeBlockMathRenderer(options.renderingOptions, suffix);
