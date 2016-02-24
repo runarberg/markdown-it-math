@@ -267,8 +267,8 @@ module.exports = function math_plugin(md, options) {
   var inlineRenderer = makeInlineMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeBlockMathRenderer(options.renderingOptions, suffix);
 
-  var math_inline = makeMath_inline(inlineOpen, inlineClose, suffix);
-  var math_block = makeMath_block(blockOpen, blockClose, suffix, blockStartsWith, blockEndsWith);
+  var math_inline = makeMath_inline(inlineOpen, inlineClose);
+  var math_block = makeMath_block(blockOpen, blockClose, blockStartsWith, blockEndsWith);
 
  md.inline.ruler.before('escape', 'math_inline', math_inline);
  md.block.ruler.after('blockquote', 'math_block', math_block, {
