@@ -133,6 +133,11 @@ function makeMath_block(open, close) {
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
 
+    // first try inline
+    if (makeMath_inline(open, close)({pos: pos, posMax: max, src: state.src, md: state.md}, silent)) {
+      return false;
+    }
+
     if (pos + open.length > max) { return false; }
 
     openDelim = state.src.slice(pos, pos + open.length);
@@ -213,10 +218,23 @@ function makeMath_block(open, close) {
   };
 }
 
-function makeMathRenderer(renderingOptions, suffix) {
+function makeInlineMathRenderer(renderingOptions, suffix) {
   return function(tokens, idx) {
       return '<span id="' + prefix + divIndex++ + suffix +
        '" class="math inline">' + tokens[idx].content + '</span>';
+    };
+  // renderingOptions && renderingOptions.display === 'block' ?
+  //   function(tokens, idx) {
+  //     return '<div id="' + prefix + divIndex++ + suffix +
+  //      '" class="math block text-center">' + tokens[idx].content + '</div>';
+  //   } :
+    
+}
+
+function makeBlockMathRenderer(renderingOptions, suffix) {
+  return function(tokens, idx) {
+      return '<span id="' + prefix + divIndex++ + suffix +
+       '" class="math block">' + tokens[idx].content + '</span>';
     };
   // renderingOptions && renderingOptions.display === 'block' ?
   //   function(tokens, idx) {
@@ -236,17 +254,16 @@ module.exports = function math_plugin(md, options) {
       blockOpen = options.blockOpen || 'blockOpen',
       blockClose = options.blockClose || 'blockClose',
       suffix = options.suffix || 'noSuffixProvided';
-  var inlineRenderer = makeMathRenderer(options.renderingOptions, suffix);
-  // var blockRenderer = makeMathRenderer(Object.assign({ display: 'block' },
-  //                                    options.renderingOptions), suffix);
+  var inlineRenderer = makeInlineMathRenderer(options.renderingOptions, suffix);
+  var blockRenderer = makeBlockMathRenderer(options.renderingOptions, suffix);
 
   var math_inline = makeMath_inline(inlineOpen, inlineClose, suffix);
-  var math_block = makeMath_block(blockOpen, blockClose, suffix);
+  // var math_block = makeMath_block(blockOpen, blockClose, suffix);
 
   md.block.ruler.before('blockquote', 'math_inline', math_inline);
   md.block.ruler.after('blockquote', 'math_block', math_block, {
     alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
   });
   md.renderer.rules.math_inline = inlineRenderer;
-  md.renderer.rules.math_block = inlineRenderer;
+  md.renderer.rules.math_block = blockRenderer;
 };
