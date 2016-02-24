@@ -126,7 +126,7 @@ function makeMath_inline(open, close) {
   };
 }
 
-function makeMath_block(openList, closeList) {
+function makeMath_block(openList, closeList, blockStartsWith, blockEndsWith) {
   return function math_block(state, startLine, endLine, silent) {
     var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
@@ -184,9 +184,15 @@ function makeMath_block(openList, closeList) {
         break;
       }
 
-      if (state.src.slice(pos, max).trim().slice(-close.length) !== close) {
-        continue;
+      var close = '';
+      for (var i = 0; i < closeList.length && close.length == 0; i++) {
+        if (state.src.slice(pos, max).trim().slice(-closeList[i].length) === closeList[i]) {
+          close = closeList[i];
+        }
       }
+
+      if (close.length == 0)
+        continue;
 
       if (state.tShift[nextLine] - state.blkIndent >= 4) {
         // closing block math should be indented less then 4 spaces
@@ -212,11 +218,17 @@ function makeMath_block(openList, closeList) {
 
     state.line = nextLine + (haveEndMarker ? 1 : 0);
 
-    token = state.push('math_block', 'math', 0);
-    token.block = true;
-    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
+    var content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
       state.getLines(startLine + 1, nextLine, len, true) +
       (lastLine && lastLine.trim() ? lastLine : '');
+
+    if (!content.startsWith(blockStartsWith) || !content.endsWith(blockEndsWith)) {
+      return false;
+    }
+
+    token = state.push('math_block', 'math', 0);
+    token.block = true;
+    token.content = content;
     token.info = params;
     token.map = [ startLine, state.line ];
     token.markup = open;
@@ -259,12 +271,14 @@ module.exports = function math_plugin(md, options) {
       inlineClose = options.inlineClose || '$$',
       blockOpen = options.blockOpen || ['$$\n'],
       blockClose = options.blockClose || ['\n$$'],
+      blockStartsWith = options.blockStartsWith || '\\begin{aligned}',
+      blockEndsWith = options.blockEndsWith || '\\end{aligned}',
       suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeInlineMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeBlockMathRenderer(options.renderingOptions, suffix);
 
   var math_inline = makeMath_inline(inlineOpen, inlineClose, suffix);
-  var math_block = makeMath_block(blockOpen, blockClose, suffix);
+  var math_block = makeMath_block(blockOpen, blockClose, suffix, blockStartsWith, blockEndsWith);
 
  md.inline.ruler.before('escape', 'math_inline', math_inline);
  md.block.ruler.after('blockquote', 'math_block', math_block, {
