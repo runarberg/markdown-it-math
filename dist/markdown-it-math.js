@@ -201,10 +201,12 @@ function makeMath_block(openList, closeList, blockStartsWith, blockEndsWith) {
     // Since start is found, we can report success here in validation mode
     if (silent) { return true; }
 
-    if (firstLine.trim().slice(-close.length) === close) {
-      // Single line expression
-      firstLine = firstLine.trim().slice(0, -close.length);
-      haveEndMarker = true;
+    for (var i = 0; i < closeList.length; i++) {
+      if (firstLine.trim().slice(-closeList[i].length) === closeList[i]) {
+        // Single line expression
+        firstLine = firstLine.trim().slice(0, -closeList[i].length);
+        haveEndMarker = true;
+      }
     }
 
     // search end of block
