@@ -142,9 +142,9 @@ function makeMath_block(openList, closeList) {
       return false;
 
     var open = '';
-    openDelim = state.src.slice(pos, pos + open.length);
 
     for (var i = 0; i < openList.length && open === ''; i++) {
+      openDelim = state.src.slice(pos, pos + openList[i].length);
       if (openDelim === openList[i]) { open = openList[i]; }
     }
 
