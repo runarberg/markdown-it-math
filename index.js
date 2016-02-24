@@ -147,6 +147,8 @@ function makeMath_block(openList, closeList) {
       openDelim = state.src.slice(pos, pos + possibleTokens[i].length);
       if (openDelim === possibleTokens[i]) { open = possibleTokens[i]; }
     }
+    if (open.length == 0)
+      return false;
 
     pos += open.length;
     firstLine = state.src.slice(pos, max);
