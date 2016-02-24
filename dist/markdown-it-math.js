@@ -178,19 +178,19 @@ function makeMath_block(openList, closeList) {
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
 
-    var hasPossibleToken = false;
+    var possibleTokens = [];
     for (var i = 0; i < openList.length; i++) {
-      if (pos + openList[i].length <= max) { hasPossibleToken = true; }
+      if (pos + openList[i].length <= max) { possibleTokens.push(openList[i]); }
     }
 
-    if (!hasPossibleToken)
+    if (possibleTokens.length == 0)
       return false;
 
     var open = '';
 
-    for (var i = 0; i < openList.length && open === ''; i++) {
-      openDelim = state.src.slice(pos, pos + openList[i].length);
-      if (openDelim === openList[i]) { open = openList[i]; }
+    for (var i = 0; i < possibleTokens.length && open === ''; i++) {
+      openDelim = state.src.slice(pos, pos + possibleTokens[i].length);
+      if (openDelim === possibleTokens[i]) { open = possibleTokens[i]; }
     }
 
     pos += open.length;
