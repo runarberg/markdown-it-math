@@ -179,7 +179,7 @@ function makeMath_block(openList, closeList, blockStartsWith, blockEndsWith) {
       pos = state.bMarks[nextLine] + state.tShift[nextLine];
       max = state.eMarks[nextLine];
 
-      if (pos < max && state.tShift[nextLine] < state.blkIndent) {
+      if (pos < max && state.tShift[nextLine] < state.blkIfndent) {
         // non-empty line with negative indent should stop the list:
         break;
       }
@@ -241,25 +241,13 @@ function makeInlineMathRenderer(renderingOptions, suffix) {
       return '<span id="' + prefix + divIndex++ + suffix +
        '" class="math inline">' + tokens[idx].content + '</span>';
     };
-  // renderingOptions && renderingOptions.display === 'block' ?
-  //   function(tokens, idx) {
-  //     return '<div id="' + prefix + divIndex++ + suffix +
-  //      '" class="math block text-center">' + tokens[idx].content + '</div>';
-  //   } :
-    
 }
 
 function makeBlockMathRenderer(renderingOptions, suffix) {
   return function(tokens, idx) {
       return '<span id="' + prefix + divIndex++ + suffix +
        '" class="math block">' + tokens[idx].content + '</span>';
-    };
-  // renderingOptions && renderingOptions.display === 'block' ?
-  //   function(tokens, idx) {
-  //     return '<div id="' + prefix + divIndex++ + suffix +
-  //      '" class="math block text-center">' + tokens[idx].content + '</div>';
-  //   } :
-    
+    };    
 }
 
 
