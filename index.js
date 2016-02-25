@@ -135,7 +135,7 @@ function makeMath_block(openList, closeList, blockStartsWith, blockEndsWith) {
 
     var possibleTokens = [];
     for (var i = 0; i < openList.length; i++) {
-      if (pos + openList[i].length <= max || (openList[i].endsWith('\n') && pos + openList[i].length + 1 == max)) {
+      if (pos + openList[i].length <= max || (openList[i].endsWith('\n') && pos + openList[i].length == max + 1)) {
         possibleTokens.push(openList[i]); 
       }
     }
