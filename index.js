@@ -1,8 +1,8 @@
 /* Process inline math */
 
 'use strict';
-
-var ascii2mathml = null;
+var prefix = 'mathjax-';
+var divIndex = 0;
 require('./lib/polyfills');
 
 
@@ -118,6 +118,7 @@ function makeMath_inline(open, close) {
     token.content = state.src.slice(state.pos, state.posMax);
     token.markup = open;
 
+
     state.pos = state.posMax + close.length;
     state.posMax = max;
 
@@ -125,18 +126,31 @@ function makeMath_inline(open, close) {
   };
 }
 
-function makeMath_block(open, close) {
+function makeMath_block(openList, closeList, blockStartsWith, blockEndsWith) {
   return function math_block(state, startLine, endLine, silent) {
     var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
         haveEndMarker = false,
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
 
-    if (pos + open.length > max) { return false; }
+    var possibleTokens = [];
+    for (var i = 0; i < openList.length; i++) {
+      if (pos + openList[i].length <= max || (openList[i].endsWith('\n') && pos + openList[i].length == max + 1)) {
+        possibleTokens.push(openList[i]); 
+      }
+    }
 
-    openDelim = state.src.slice(pos, pos + open.length);
+    if (possibleTokens.length == 0)
+      return false;
 
-    if (openDelim !== open) { return false; }
+    var open = '';
+
+    for (var i = 0; i < possibleTokens.length && open === ''; i++) {
+      openDelim = state.src.slice(pos, pos + possibleTokens[i].length);
+      if (openDelim === possibleTokens[i]) { open = possibleTokens[i]; }
+    }
+    if (open.length == 0)
+      return false;
 
     pos += open.length;
     firstLine = state.src.slice(pos, max);
@@ -144,10 +158,12 @@ function makeMath_block(open, close) {
     // Since start is found, we can report success here in validation mode
     if (silent) { return true; }
 
-    if (firstLine.trim().slice(-close.length) === close) {
-      // Single line expression
-      firstLine = firstLine.trim().slice(0, -close.length);
-      haveEndMarker = true;
+    for (var i = 0; i < closeList.length; i++) {
+      if (firstLine.trim().slice(-closeList[i].length) === closeList[i]) {
+        // Single line expression
+        firstLine = firstLine.trim().slice(0, -closeList[i].length);
+        haveEndMarker = true;
+      }
     }
 
     // search end of block
@@ -167,14 +183,20 @@ function makeMath_block(open, close) {
       pos = state.bMarks[nextLine] + state.tShift[nextLine];
       max = state.eMarks[nextLine];
 
-      if (pos < max && state.tShift[nextLine] < state.blkIndent) {
+      if (pos < max && state.tShift[nextLine] < state.blkIfndent) {
         // non-empty line with negative indent should stop the list:
         break;
       }
 
-      if (state.src.slice(pos, max).trim().slice(-close.length) !== close) {
-        continue;
+      var close = '';
+      for (var i = 0; i < closeList.length && close.length == 0; i++) {
+        if (state.src.slice(pos, max).trim().slice(-closeList[i].length) === closeList[i]) {
+          close = closeList[i];
+        }
       }
+
+      if (close.length == 0)
+        continue;
 
       if (state.tShift[nextLine] - state.blkIndent >= 4) {
         // closing block math should be indented less then 4 spaces
@@ -200,70 +222,58 @@ function makeMath_block(open, close) {
 
     state.line = nextLine + (haveEndMarker ? 1 : 0);
 
-    token = state.push('math_block', 'math', 0);
-    token.block = true;
-    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
+    var content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
       state.getLines(startLine + 1, nextLine, len, true) +
       (lastLine && lastLine.trim() ? lastLine : '');
+
+    if (!content.startsWith(blockStartsWith) || !content.endsWith(blockEndsWith)) {
+      return false;
+    }
+
+    token = state.push('math_block', 'math', 0);
+    token.block = true;
+    token.content = content;
     token.info = params;
     token.map = [ startLine, state.line ];
     token.markup = open;
-
     return true;
   };
 }
 
-function makeMathRenderer(renderingOptions) {
-  if (ascii2mathml === null) {
-    try {
-      ascii2mathml = require('ascii2mathml');
-    } catch (e) {
-      return renderingOptions && renderingOptions.display === 'block' ?
-        function(tokens, idx) {
-          return '<div class="math block">' + tokens[idx].content + '</div>';
-        } :
-        function(tokens, idx) {
-          return '<span class="math inline">' + tokens[idx].content + '</span>';
-        };
-    }
-  }
-
-  var mathml = ascii2mathml(Object.assign({}, renderingOptions));
-
-  return renderingOptions && renderingOptions.display === 'block' ?
-    function(tokens, idx) {
-      return mathml(tokens[idx].content) + '\n';
-    } :
-    function(tokens, idx) {
-      return mathml(tokens[idx].content);
+function makeInlineMathRenderer(renderingOptions, suffix) {
+  return function(tokens, idx) {
+      return '<span id="' + prefix + divIndex++ + suffix +
+       '" class="math inline">' + tokens[idx].content + '</span>';
     };
+}
+
+function makeBlockMathRenderer(renderingOptions, suffix) {
+  return function(tokens, idx) {
+      return '<span id="' + prefix + divIndex++ + suffix +
+       '" class="math block">' + tokens[idx].content + '</span>';
+    };    
 }
 
 
 module.exports = function math_plugin(md, options) {
+  divIndex = 0;
   // Default options
   options = typeof options === 'object' ? options : {};
   var inlineOpen = options.inlineOpen || '$$',
       inlineClose = options.inlineClose || '$$',
-      blockOpen = options.blockOpen || '$$$',
-      blockClose = options.blockClose || '$$$';
-  var inlineRenderer = options.inlineRenderer ?
-        function(tokens, idx) {
-          return options.inlineRenderer(tokens[idx].content);
-        } :
-      makeMathRenderer(options.renderingOptions);
-  var blockRenderer = options.blockRenderer ?
-        function(tokens, idx) {
-          return options.blockRenderer(tokens[idx].content) + '\n';
-        } :
-      makeMathRenderer(Object.assign({ display: 'block' },
-                                     options.renderingOptions));
+      blockOpen = options.blockOpen || ['$$\n'],
+      blockClose = options.blockClose || ['\n$$'],
+      blockStartsWith = options.blockStartsWith || '\\begin{aligned}',
+      blockEndsWith = options.blockEndsWith || '\\end{aligned}\n',
+      suffix = options.suffix || 'noSuffixProvided';
+  var inlineRenderer = makeInlineMathRenderer(options.renderingOptions, suffix);
+  var blockRenderer = makeBlockMathRenderer(options.renderingOptions, suffix);
 
   var math_inline = makeMath_inline(inlineOpen, inlineClose);
-  var math_block = makeMath_block(blockOpen, blockClose);
+  var math_block = makeMath_block(blockOpen, blockClose, blockStartsWith, blockEndsWith);
 
-  md.inline.ruler.before('escape', 'math_inline', math_inline);
-  md.block.ruler.after('blockquote', 'math_block', math_block, {
+ md.inline.ruler.before('escape', 'math_inline', math_inline);
+ md.block.ruler.after('blockquote', 'math_block', math_block, {
     alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
   });
   md.renderer.rules.math_inline = inlineRenderer;
