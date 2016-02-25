@@ -135,7 +135,9 @@ function makeMath_block(openList, closeList, blockStartsWith, blockEndsWith) {
 
     var possibleTokens = [];
     for (var i = 0; i < openList.length; i++) {
-      if (pos + openList[i].length <= max) { possibleTokens.push(openList[i]); }
+      if (pos + openList[i].length <= max || (openList[i].endsWith('\n') && pos + openList[i].length + 1 == max)) {
+        possibleTokens.push(openList[i]); 
+      }
     }
 
     if (possibleTokens.length == 0)
@@ -262,7 +264,7 @@ module.exports = function math_plugin(md, options) {
       blockOpen = options.blockOpen || ['$$\n'],
       blockClose = options.blockClose || ['\n$$'],
       blockStartsWith = options.blockStartsWith || '\\begin{aligned}',
-      blockEndsWith = options.blockEndsWith || '\\end{aligned}',
+      blockEndsWith = options.blockEndsWith || '\\end{aligned}\n',
       suffix = options.suffix || 'noSuffixProvided';
   var inlineRenderer = makeInlineMathRenderer(options.renderingOptions, suffix);
   var blockRenderer = makeBlockMathRenderer(options.renderingOptions, suffix);
