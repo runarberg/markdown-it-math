@@ -14,7 +14,7 @@ $$$
 1+1 = 2
 $$$
 .
-<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<p><math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>
 .
 
 
@@ -42,16 +42,18 @@ foo$$1+1 = 2$$bar
 .
 
 
-Paragraph breaks are unnecessary before and after display math
+Paragraph breaks are necessary before and after display math
 .
 foo
+
 $$$
 x + y
 $$$
+
 bar
 .
 <p>foo</p>
-<math display="block"><mi>x</mi><mo>+</mo><mi>y</mi></math>
+<p><math display="block"><mi>x</mi><mo>+</mo><mi>y</mi></math></p>
 <p>bar</p>
 .
 
@@ -86,16 +88,12 @@ foo $$1 *i* 1$$ bar
 Display math with apparent markup
 .
 foo
-
 $$$
 1 *i* 1
 $$$
-
 bar
 .
-<p>foo</p>
-<math display="block"><mn>1</mn><mo>·</mo><mi>i</mi><mo>·</mo><mn>1</mn></math>
-<p>bar</p>
+<p>foo<math display="block"><mn>1</mn><mo>·</mo><mi>i</mi><mo>·</mo><mn>1</mn></math>bar</p>
 .
 
 
@@ -105,7 +103,7 @@ Block math can be indented up to 3 spaces
    1+1 = 2
    $$$
 .
-<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<p><math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>
 .
 
 
@@ -142,7 +140,7 @@ $$$
 
 $$$
 .
-<math display="block"><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></math>
+<p><math display="block"><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></math></p>
 .
 
 
@@ -157,7 +155,7 @@ $$$
 = 3
 $$$
 .
-<math display="block"><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>3</mn></math>
+<p><math display="block"><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>3</mn></math></p>
 .
 
 
@@ -174,7 +172,7 @@ Display math self-closes at the end of document
 $$$
 1+1 = 2
 .
-<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<p><math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>
 .
 
 
@@ -198,7 +196,7 @@ Display math can be written in one line
 .
 $$$1+1 = 2$$$
 .
-<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>
+<p><math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>
 .
 
 
@@ -209,7 +207,7 @@ $$$[
 [3, 4]
 ]$$$
 .
-<math display="block"><mfenced open="[" close="]"><mtable><mtr></mtr><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr></mtr></mtable></mfenced></math>
+<p><math display="block"><mfenced open="[" close="]"><mtable><mtr></mtr><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr></mtr></mtable></mfenced></math></p>
 .
 
 
