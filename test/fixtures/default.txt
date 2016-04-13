@@ -41,6 +41,12 @@ foo$$1+1 = 2$$bar
 <p>foo<math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>bar</p>
 .
 
+Same goes for punctuation
+.
+foo$$-2x < 4$$bar
+.
+<p>foo<math><mrow><mo>-</mo><mn>2</mn><mi>x</mi></mrow><mo>&lt;</mo><mn>4</mn></math>bar</p>
+.
 
 Paragraph breaks are unnecessary before and after display math
 .

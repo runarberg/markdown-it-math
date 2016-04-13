@@ -5725,14 +5725,11 @@ require('./lib/polyfills');
 
 function scanDelims(state, start, delimLength) {
   var pos = start, lastChar, nextChar, count, can_open, can_close,
-      isLastWhiteSpace, isLastPunctChar,
-      isNextWhiteSpace, isNextPunctChar,
+      isLastWhiteSpace, isNextWhiteSpace,
       left_flanking = true,
       right_flanking = true,
       max = state.posMax,
-      isWhiteSpace = state.md.utils.isWhiteSpace,
-      isPunctChar = state.md.utils.isPunctChar,
-      isMdAsciiPunct = state.md.utils.isMdAsciiPunct;
+      isWhiteSpace = state.md.utils.isWhiteSpace;
 
   // treat beginning of the line as a whitespace
   lastChar = start > 0 ? state.src.charCodeAt(start - 1) : 0x20;
@@ -5748,26 +5745,15 @@ function scanDelims(state, start, delimLength) {
   // treat end of the line as a whitespace
   nextChar = pos < max ? state.src.charCodeAt(pos) : 0x20;
 
-  isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar));
-  isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar));
-
   isLastWhiteSpace = isWhiteSpace(lastChar);
   isNextWhiteSpace = isWhiteSpace(nextChar);
 
   if (isNextWhiteSpace) {
     left_flanking = false;
-  } else if (isNextPunctChar) {
-    if (!(isLastWhiteSpace || isLastPunctChar)) {
-      left_flanking = false;
-    }
   }
 
   if (isLastWhiteSpace) {
     right_flanking = false;
-  } else if (isLastPunctChar) {
-    if (!(isNextWhiteSpace || isNextPunctChar)) {
-      right_flanking = false;
-    }
   }
 
   can_open = left_flanking;
