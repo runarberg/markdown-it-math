@@ -1,8 +1,13 @@
-markdown-it-math
-================
-
 [![npm](https://img.shields.io/npm/v/markdown-it-math.svg)](https://www.npmjs.com/package/markdown-it-math)
 [![Build Status](https://travis-ci.org/runarberg/markdown-it-math.svg?branch=master)](https://travis-ci.org/runarberg/markdown-it-math)
+
+**Note:** This is a general [markdown-it][markdown-it] math plugin. It
+was originally designed to render [MathML][mathml]. If you intend to
+use [MathJax][mathjax], [markdown-it-mathjax][markdown-it-mathjax]
+might be a better choise.
+
+markdown-it-math
+================
 
 ```md
 Pythagoran theorem is $$a^2 + b^2 = c^2$$.
@@ -50,7 +55,7 @@ var options = {
 }
 ```
 
-(See [ascii2mathml](http://runarberg.github.io/ascii2mathml/) for reference about the default renderer).
+(See [ascii2mathml][ascii2mathml] for reference about the default renderer).
 
 
 Examples
@@ -68,7 +73,7 @@ md.render("$$40,2$$");
 // <p><math><mn>40,2</mn></math></p>
 ```
 
-Using [TeXZilla](http://fred-wang.github.io/TeXZilla/) as renderer
+Using [TeXZilla][texzilla] as renderer
 
 ```javascript
 var texzilla = require('texzilla');
@@ -114,3 +119,9 @@ e = sum_(n=0)^oo 1/n!
 ```
 
 [1]: https://github.com/markdown-it/markdown-it/blob/master/docs/development.md#why-my-inline-rule-is-not-executed
+[ascii2mathml]: http://runarberg.github.io/ascii2mathml/
+[mathjax]: https://www.mathjax.org/
+[mathml]: https://www.w3.org/TR/MathML/
+[markdown-it]: https://github.com/markdown-it/markdown-it
+[markdown-it-mathjax]: https://www.npmjs.com/package/markdown-it-mathjax
+[texzilla]: http://fred-wang.github.io/TeXZilla/
