@@ -235,12 +235,12 @@ module.exports = function math_plugin(md, options) {
       blockClose = options.blockClose || '$$$';
   var inlineRenderer = options.inlineRenderer ?
         function(tokens, idx) {
-          return options.inlineRenderer(tokens[idx].content);
+          return options.inlineRenderer(tokens[idx].content, tokens[idx]);
         } :
       makeMathRenderer(options.renderingOptions);
   var blockRenderer = options.blockRenderer ?
         function(tokens, idx) {
-          return options.blockRenderer(tokens[idx].content) + '\n';
+          return options.blockRenderer(tokens[idx].content, tokens[idx]) + '\n';
         } :
       makeMathRenderer(Object.assign({ display: 'block' },
                                      options.renderingOptions));
