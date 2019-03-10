@@ -202,7 +202,7 @@ function makeMath_block(open, close) {
 function makeMathRenderer(renderingOptions) {
   if (ascii2mathml === null) {
     try {
-      ascii2mathml = require('ascii2mathml');
+      ascii2mathml = require('ascii2mathml').default;
     } catch (e) {
       return renderingOptions && renderingOptions.display === 'block' ?
         function(tokens, idx) {
