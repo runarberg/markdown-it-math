@@ -11,7 +11,7 @@
     "predist": "npm run test",
     "dist": "rm -fr dist; mkdir dist; npm run browserify; npm run minify",
     "lint": "eslint index.js lib/",
-    "minify": "uglifyjs dist/markdown-it-math.js -b beautify=false,ascii-only=true -c -m --preamble \"/*! ${npm_package_name} ${npm_package_version} ${npm_package_homepage} @license MIT */\" > dist/markdown-it-math.min.js",
+    "minify": "uglifyjs dist/markdown-it-math.js -b beautify=false,ascii_only=true -c -m --preamble \"/*! ${npm_package_name} ${npm_package_version} ${npm_package_homepage} @license MIT */\" > dist/markdown-it-math.min.js",
     "prepublish": "npm run dist",
     "pretest": "npm run lint",
     "test": "mocha"
@@ -37,14 +37,15 @@
     "ascii2mathml": "^0.6.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.4",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
     "eslint": "^5.14.1",
     "lodash": "^4.17.11",
     "markdown-it": "^8.4.2",
-    "markdown-it-testgen": "^0.1.4",
+    "markdown-it-testgen": "^0.1.5",
     "mocha": "^6.0.2",
     "texzilla": "^0.9.9",
-    "uglifyjs": "^2.4.11"
+    "uglify-js": "^3.4.9"
   }
 }
