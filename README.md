@@ -49,6 +49,7 @@ var options = {
     blockOpen: '$$$',
     blockClose: '$$$',
     renderingOptions: {},
+    loose: false, // true to allow whitespace immediately after inline opening, see #21
     inlineRenderer: require('ascii2mathml')(this.rendererOptions),
     blockRenderer: require('ascii2mathml')(Object.assign({ display: 'block' },
                                                          this.renderingOptions))

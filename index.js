@@ -50,7 +50,7 @@ function scanDelims(state, start, delimLength) {
 }
 
 
-function makeMath_inline(open, close) {
+function makeMath_inline(open, close, loose) {
   return function math_inline(state, silent) {
     var startCount,
         found,
@@ -67,7 +67,7 @@ function makeMath_inline(open, close) {
     res = scanDelims(state, start, openDelim.length);
     startCount = res.delims;
 
-    if (!res.can_open) {
+    if (!(res.can_open || loose)) {
       state.pos += startCount;
       // Earlier we checked !silent, but this implementation does not need it
       state.pending += state.src.slice(start, state.pos);
@@ -80,7 +80,7 @@ function makeMath_inline(open, close) {
       closeDelim = state.src.slice(state.pos, state.pos + close.length);
       if (closeDelim === close) {
         res = scanDelims(state, state.pos, close.length);
-        if (res.can_close) {
+        if (res.can_close || loose) {
           found = true;
           break;
         }
@@ -232,7 +232,8 @@ module.exports = function math_plugin(md, options) {
   var inlineOpen = options.inlineOpen || '$$',
       inlineClose = options.inlineClose || '$$',
       blockOpen = options.blockOpen || '$$$',
-      blockClose = options.blockClose || '$$$';
+      blockClose = options.blockClose || '$$$',
+      loose = !!options.loose;
   var inlineRenderer = options.inlineRenderer ?
         function(tokens, idx) {
           return options.inlineRenderer(tokens[idx].content, tokens[idx]);
@@ -245,7 +246,7 @@ module.exports = function math_plugin(md, options) {
       makeMathRenderer(Object.assign({ display: 'block' },
                                      options.renderingOptions));
 
-  var math_inline = makeMath_inline(inlineOpen, inlineClose);
+  var math_inline = makeMath_inline(inlineOpen, inlineClose, loose);
   var math_block = makeMath_block(blockOpen, blockClose);
 
   md.inline.ruler.before('escape', 'math_inline', math_inline);

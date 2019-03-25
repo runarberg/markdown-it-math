@@ -31,6 +31,17 @@ describe('Options', function() {
     assert.equal(res1, '<p><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>\n');
     assert.equal(res2, '<math display="block"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\n');
   });
+  it('Should allow whitespace immediately after inline opening in loose mode', function() {
+    var md = require('markdown-it')()
+          .use(require('../'), {
+            inlineOpen: '$',
+            inlineClose: '$',
+            loose: true
+          });
+
+    var res = md.render('$ 1+1 = 2 $');
+    assert.equal(res, '<p><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>\n');
+  });
 });
 
 describe("Rendering options", function() {
