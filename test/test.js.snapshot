@@ -1,0 +1,119 @@
+exports[`Block Math > Block math can be indented up to 3 spaces 1`] = `
+"<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Block Math > Block math with apparent markup 1`] = `
+"<p>foo</p>\\n<math display=\\"block\\"><mn>1</mn><mrow><mo>·</mo><mi>i</mi><mo>·</mo></mrow><mn>1</mn></math>\\n<p>bar</p>\\n"
+`;
+
+exports[`Block Math > But 4 means a code block 1`] = `
+"<pre><code>$$\\n1+1 = 2\\n$$\\n</code></pre>\\n"
+`;
+
+exports[`Block Math > Can appear in lists 1`] = `
+"<ul>\\n<li><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></li>\\n<li>\\n<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n</li>\\n</ul>\\n"
+`;
+
+exports[`Block Math > Can be escaped 1`] = `
+"<p>Foo\\n$$\\n1\\n$$</p>\\n"
+`;
+
+exports[`Block Math > Can be written in one line 1`] = `
+"<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Block Math > Can span multiple lines 1`] = `
+"<math display=\\"block\\"><mrow><mo fence=\\"true\\">[</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo fence=\\"true\\">]</mo></mrow></math>\\n"
+`;
+
+exports[`Block Math > Multiline block math 1`] = `
+"<math display=\\"block\\"><mn>1</mn><mspace depth=\\"1em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"2em\\" /><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Block Math > Multiline math that might look like an unordered list 1`] = `
+"<math display=\\"block\\"><mn>1</mn><mspace depth=\\"2em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"1em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"2em\\" /><mo>=</mo><mn>3</mn></math>\\n"
+`;
+
+exports[`Block Math > Paragraph breaks around delims are not required 1`] = `
+"<p>foo</p>\\n<math display=\\"block\\"><mi>x</mi><mo>+</mo><mi>y</mi></math>\\n<p>bar</p>\\n"
+`;
+
+exports[`Block Math > Simple block math 1`] = `
+"<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Inline Math > Can be escaped 1`] = `
+"<p>Foo $1$ bar</p>\\n"
+`;
+
+exports[`Inline Math > End of document is not allowed 1`] = `
+"<p>foo $1+1 = 2</p>\\n"
+`;
+
+exports[`Inline Math > Inline math with apparent markup 1`] = `
+"<p>foo <math><mn>1</mn><mrow><mo>·</mo><mi>i</mi><mo>·</mo></mrow><mn>1</mn></math> bar</p>\\n"
+`;
+
+exports[`Inline Math > Multiline inline math 1`] = `
+"<p>foo <math><mn>1</mn><mo>+</mo><mn>1</mn><mspace depth=\\"1em\\" /><mo>=</mo><mn>2</mn></math> bar</p>\\n"
+`;
+
+exports[`Inline Math > Paragraph break in inline math is not allowed 1`] = `
+"<p>foo $1+1</p>\\n<p>= 2$ bar</p>\\n"
+`;
+
+exports[`Inline Math > Punctuation can immediately follow 1`] = `
+"<p>The <math><mi>n</mi></math>-th order</p>\\n"
+`;
+
+exports[`Inline Math > Punctuation can immediately precede 1`] = `
+"<p>foo!<math><mn>42</mn></math>bar</p>\\n"
+`;
+
+exports[`Inline Math > Punctuation immediatly after opening is fine 1`] = `
+"<p>foo<math><mrow><mo>−</mo><mn>2</mn><mi>x</mi></mrow><mo>&lt;</mo><mn>4</mn></math>bar</p>\\n"
+`;
+
+exports[`Inline Math > Punctuation immediatly before closing is fine 1`] = `
+"<p>foo<math><mrow><mi>f</mi><mo lspace=\\"0\\" rspace=\\"0\\">′</mo></mrow></math>bar</p>\\n"
+`;
+
+exports[`Inline Math > Self-closes at the end of document 1`] = `
+"<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Inline Math > Simple inline math 1`] = `
+"<p><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>\\n"
+`;
+
+exports[`Inline Math > Whitespace around delims is not required 1`] = `
+"<p>foo<math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>bar</p>\\n"
+`;
+
+exports[`Inline Math > Whitespace immediately after opening is not allowed 1`] = `
+"<p>foo$ 1+1 = 2$ bar</p>\\n"
+`;
+
+exports[`Inline Math > Whitespace immediately before closing is not allowed 1`] = `
+"<p>foo $1+1 = 2 $bar</p>\\n"
+`;
+
+exports[`Options > Different options for the default renderer 1`] = `
+"<p><math><mn>40,2</mn></math></p>\\n<math display=\\"block\\"><mn>40,2</mn></math>\\n"
+`;
+
+exports[`Options > LaTeX style delims 1`] = `
+"<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Options > Thick dollar delims 1`] = `
+"<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Options > Use TexZilla as renderer > block 1`] = `
+"<math display=\\"block\\" xmlns=\\"http://www.w3.org/1998/Math/MathML\\"><semantics><mrow><mo lspace=\\"0em\\" rspace=\\"0em\\">sin</mo><mo stretchy=\\"false\\">(</mo><mn>2</mn><mi>π</mi><mo stretchy=\\"false\\">)</mo></mrow><annotation encoding=\\"TeX\\">\\\\sin(2\\\\pi)\\n</annotation></semantics></math>\\n"
+`;
+
+exports[`Options > Use TexZilla as renderer > inline 1`] = `
+"<p><math xmlns=\\"http://www.w3.org/1998/Math/MathML\\"><semantics><mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow><annotation encoding=\\"TeX\\">1+1 = 2</annotation></semantics></math></p>\\n"
+`;

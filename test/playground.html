@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "markdown-it": "https://cdn.jsdelivr.net/npm/markdown-it@14/+esm",
+          "markdown-it-math": "/index.js",
+          "mathup": "https://cdn.jsdelivr.net/npm/mathup/+esm"
+        }
+      }
+    </script>
+
+    <script type="module" defer>
+      import markdownIt from "markdown-it";
+      import markdownItMath from "markdown-it-math";
+
+      const md = markdownIt().use(markdownItMath);
+
+      const source = document.getElementById("source");
+      const output = document.getElementById("output");
+
+      function render() {
+        output.innerHTML = md.render(source.value);
+      }
+
+      source.addEventListener("input", render);
+      render();
+    </script>
+
+    <style>
+      body {
+        display: grid;
+        grid-gap: 1em;
+        grid-template-columns: 45ch 1fr;
+      }
+
+      #source {
+        inline-size: auto;
+        min-block-size: 10em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <textarea id="source">
+## This is a test
+
+Pythagoran theorem is $a^2 + b^2 = c^2$.
+
+**Bayes theorem**:
+
+$$
+P(A | B) = (P(B | A)P(A)) / P(B)
+$$
+    </textarea>
+    <output id="output"></output>
+  </body>
+</html>

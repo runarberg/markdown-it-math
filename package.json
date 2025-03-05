@@ -1,20 +1,22 @@
 {
   "name": "markdown-it-math",
   "version": "4.1.1",
+  "type": "module",
   "description": "Markdown-it plugin to include math in your document",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
+  "types": "types/index.js",
   "scripts": {
-    "browserify": "(echo \"/*! ${npm_package_name} ${npm_package_version} ${npm_package_homepage} @license MIT */\"; browserify ./ -s markdownitMath) > dist/markdown-it-math.js",
-    "predist": "npm run test",
-    "dist": "rm -fr dist; mkdir dist; npm run browserify; npm run minify",
-    "lint": "eslint index.js lib/",
-    "minify": "uglifyjs dist/markdown-it-math.js -b beautify=false,ascii_only=true -c -m --preamble \"/*! ${npm_package_name} ${npm_package_version} ${npm_package_homepage} @license MIT */\" > dist/markdown-it-math.min.js",
-    "prepublish": "npm run dist",
-    "pretest": "npm run lint",
-    "test": "mocha"
+    "clean": "rm -fr types/",
+    "check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "prepare": "npm run types",
+    "prettier": "prettier --write .",
+    "prettier:ci": "prettier --check .",
+    "test": "node --test --experimental-test-coverage",
+    "test:coverage-badge": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter ./test/reporters/coverage-badge-reporter.js --test-reporter-destination coverage/badge.svg",
+    "test:watch": "node --test --watch",
+    "types": "tsc index.js --allowJS --declaration --declarationMap --emitDeclarationOnly --esModuleInterop --outDir types"
   },
   "repository": {
     "type": "git",
@@ -25,7 +27,8 @@
     "markdown-it-plugin",
     "markdown",
     "MathML",
-    "AsciiMath"
+    "AsciiMath",
+    "mathup"
   ],
   "author": "Rúnar Berg Baugsson Sigríðarson",
   "license": "MIT",
@@ -33,19 +36,28 @@
     "url": "https://github.com/runarberg/markdown-it-math/issues"
   },
   "homepage": "https://github.com/runarberg/markdown-it-math",
-  "optionalDependencies": {
-    "ascii2mathml": "^0.6.2"
-  },
   "devDependencies": {
-    "@babel/core": "^7.3.4",
-    "babelify": "^10.0.0",
-    "browserify": "^16.2.3",
-    "eslint": "^5.14.1",
-    "lodash": "^4.17.11",
-    "markdown-it": "^8.4.2",
-    "markdown-it-testgen": "^0.1.5",
-    "mocha": "^6.0.2",
-    "texzilla": "^0.9.9",
-    "uglify-js": "^3.4.9"
+    "@eslint/js": "^9.21.0",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.13.9",
+    "@types/texzilla": "^0.9.4",
+    "badge-maker": "^4.1.0",
+    "eslint": "^9.21.0",
+    "eslint-plugin-jsdoc": "^50.6.3",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^16.0.0",
+    "markdown-it": "^14.1.0",
+    "prettier": "3.5.3",
+    "rollup": "^4.34.9",
+    "texzilla": "^1.0.2",
+    "typescript": "^5.8.2"
+  },
+  "peerDependencies": {
+    "mathup": "^1.0.0-rc.3"
+  },
+  "peerDependenciesMeta": {
+    "mathup": {
+      "optional": true
+    }
   }
 }
