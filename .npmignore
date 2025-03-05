@@ -1,2 +1,5 @@
+.github/
+**/*.test.js
+**/*.config.js
+coverage/
 test/
-.eslintrc

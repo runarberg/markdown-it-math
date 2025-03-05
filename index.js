@@ -1,71 +1,69 @@
-/* Process inline math */
+/**
+ * @typedef {import("mathup").Options} MathupOptions
+ * @typedef {import("markdown-it/lib/parser_block.mjs").RuleBlock} RuleBlock
+ * @typedef {import("markdown-it/lib/parser_inline.mjs").RuleInline} RuleInline
+ * @typedef {import("markdown-it/lib/rules_block/state_block.mjs").default} StateBlock
+ * @typedef {import("markdown-it/lib/rules_inline/state_inline.mjs").default} StateInline
+ */
 
-'use strict';
+/** @type {import("mathup").default | undefined} */
+let mathup;
+try {
+  mathup = (await import("mathup")).default;
+} catch {
+  // pass
+}
 
-var ascii2mathml = null;
-require('./lib/polyfills');
-
-
+/**
+ * @param {StateInline} state
+ * @param {number} start
+ * @param {number} delimLength
+ * @returns {{ can_open: boolean; can_close: boolean; delims: number }}
+ */
 function scanDelims(state, start, delimLength) {
-  var pos = start, lastChar, nextChar, count, can_open, can_close,
-      isLastWhiteSpace, isNextWhiteSpace,
-      left_flanking = true,
-      right_flanking = true,
-      max = state.posMax,
-      isWhiteSpace = state.md.utils.isWhiteSpace;
+  let pos = start;
+  const max = state.posMax;
 
   // treat beginning of the line as a whitespace
-  lastChar = start > 0 ? state.src.charCodeAt(start - 1) : 0x20;
-
-  if (pos >= max) {
-    can_open = false;
-  }
+  const lastChar = start > 0 ? state.src.charCodeAt(start - 1) : 0x20;
 
   pos += delimLength;
 
-  count = pos - start;
+  const count = pos - start;
 
   // treat end of the line as a whitespace
-  nextChar = pos < max ? state.src.charCodeAt(pos) : 0x20;
+  const nextChar = pos < max ? state.src.charCodeAt(pos) : 0x20;
 
-  isLastWhiteSpace = isWhiteSpace(lastChar);
-  isNextWhiteSpace = isWhiteSpace(nextChar);
-
-  if (isNextWhiteSpace) {
-    left_flanking = false;
-  }
-
-  if (isLastWhiteSpace) {
-    right_flanking = false;
-  }
-
-  can_open = left_flanking;
-  can_close = right_flanking;
+  const left_flanking = !state.md.utils.isWhiteSpace(nextChar);
+  const right_flanking = !state.md.utils.isWhiteSpace(lastChar);
 
   return {
-    can_open: can_open,
-    can_close: can_close,
-    delims: count
+    can_open: left_flanking,
+    can_close: right_flanking,
+    delims: count,
   };
 }
 
-
-function makeMath_inline(open, close) {
+/**
+ * @param {string} open
+ * @param {string} close
+ * @returns {RuleInline}
+ */
+function createInlineMathRule(open, close) {
   return function math_inline(state, silent) {
-    var startCount,
-        found,
-        res,
-        token,
-        closeDelim,
-        max = state.posMax,
-        start = state.pos,
-        openDelim = state.src.slice(start, start + open.length);
+    const max = state.posMax;
+    const start = state.pos;
+    const openDelim = state.src.slice(start, start + open.length);
 
-    if (openDelim !== open) { return false; }
-    if (silent) { return false; }    // Don’t run any pairs in validation mode
+    if (openDelim !== open) {
+      return false;
+    }
+    if (silent) {
+      return false;
+    } // Don’t run any pairs in validation mode
 
-    res = scanDelims(state, start, openDelim.length);
-    startCount = res.delims;
+    let res = scanDelims(state, start, openDelim.length);
+    const startCount = res.delims;
 
     if (!res.can_open) {
       state.pos += startCount;
@@ -75,6 +73,10 @@ function makeMath_inline(open, close) {
     }
 
     state.pos = start + open.length;
+
+    /** @type {string | undefined} */
+    let closeDelim;
+    let found = false;
 
     while (state.pos < max) {
       closeDelim = state.src.slice(state.pos, state.pos + close.length);
@@ -100,7 +102,7 @@ function makeMath_inline(open, close) {
     state.pos = start + close.length;
 
     // Earlier we checked !silent, but this implementation does not need it
-    token = state.push('math_inline', 'math', 0);
+    const token = state.push("math_inline", "math", 0);
     token.content = state.src.slice(state.pos, state.posMax);
     token.markup = open;
 
@@ -111,24 +113,35 @@ function makeMath_inline(open, close) {
   };
 }
 
-function makeMath_block(open, close) {
+/**
+ * @param {string} open
+ * @param {string} close
+ * @returns {RuleBlock}
+ */
+function createBlockMathRule(open, close) {
   return function math_block(state, startLine, endLine, silent) {
-    var openDelim, len, params, nextLine, token, firstLine, lastLine, lastLinePos,
-        haveEndMarker = false,
-        pos = state.bMarks[startLine] + state.tShift[startLine],
-        max = state.eMarks[startLine];
+    let pos = state.bMarks[startLine] + state.tShift[startLine];
+    let max = state.eMarks[startLine];
 
-    if (pos + open.length > max) { return false; }
+    if (pos + open.length > max) {
+      return false;
+    }
 
-    openDelim = state.src.slice(pos, pos + open.length);
+    const openDelim = state.src.slice(pos, pos + open.length);
 
-    if (openDelim !== open) { return false; }
+    if (openDelim !== open) {
+      return false;
+    }
 
     pos += open.length;
-    firstLine = state.src.slice(pos, max);
+    let firstLine = state.src.slice(pos, max);
 
     // Since start is found, we can report success here in validation mode
-    if (silent) { return true; }
+    if (silent) {
+      return true;
+    }
+
+    let haveEndMarker = false;
 
     if (firstLine.trim().slice(-close.length) === close) {
       // Single line expression
@@ -137,12 +150,16 @@ function makeMath_block(open, close) {
     }
 
     // search end of block
-    nextLine = startLine;
+    let nextLine = startLine;
+    /** @type {string | undefined} */
+    let lastLine;
 
     for (;;) {
-      if (haveEndMarker) { break; }
+      if (haveEndMarker) {
+        break;
+      }
 
-      nextLine++;
+      nextLine += 1;
 
       if (nextLine >= endLine) {
         // unclosed block should be autoclosed by end of document.
@@ -153,11 +170,6 @@ function makeMath_block(open, close) {
       pos = state.bMarks[nextLine] + state.tShift[nextLine];
       max = state.eMarks[nextLine];
 
-      if (pos < max && state.tShift[nextLine] < state.blkIndent) {
-        // non-empty line with negative indent should stop the list:
-        break;
-      }
-
       if (state.src.slice(pos, max).trim().slice(-close.length) !== close) {
         continue;
       }
@@ -167,7 +179,7 @@ function makeMath_block(open, close) {
         continue;
       }
 
-      lastLinePos = state.src.slice(0, max).lastIndexOf(close);
+      const lastLinePos = state.src.slice(0, max).lastIndexOf(close);
       lastLine = state.src.slice(pos, lastLinePos);
 
       pos += lastLine.length + close.length;
@@ -175,83 +187,97 @@ function makeMath_block(open, close) {
       // make sure tail has spaces only
       pos = state.skipSpaces(pos);
 
-      if (pos < max) { continue; }
+      if (pos < max) {
+        continue;
+      }
 
       // found!
       haveEndMarker = true;
     }
 
     // If math block has heading spaces, they should be removed from its inner block
-    len = state.tShift[startLine];
+    const len = state.tShift[startLine];
 
     state.line = nextLine + (haveEndMarker ? 1 : 0);
 
-    token = state.push('math_block', 'math', 0);
+    const token = state.push("math_block", "math", 0);
     token.block = true;
-    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '') +
+    token.content =
+      (firstLine && firstLine.trim() ? `${firstLine}\n` : "") +
       state.getLines(startLine + 1, nextLine, len, true) +
-      (lastLine && lastLine.trim() ? lastLine : '');
-    token.info = params;
-    token.map = [ startLine, state.line ];
+      (lastLine && lastLine.trim() ? lastLine : "");
+
+    token.map = [startLine, state.line];
     token.markup = open;
 
     return true;
   };
 }
 
-function makeMathRenderer(renderingOptions) {
-  if (ascii2mathml === null) {
-    try {
-      ascii2mathml = require('ascii2mathml').default;
-    } catch (e) {
-      return renderingOptions && renderingOptions.display === 'block' ?
-        function(tokens, idx) {
-          return '<div class="math block">' + tokens[idx].content + '</div>';
-        } :
-        function(tokens, idx) {
-          return '<span class="math inline">' + tokens[idx].content + '</span>';
-        };
-    }
+/**
+ * @param {MathupOptions} [options]
+ * @returns {(src: string) => string}
+ */
+function defaultInlineRenderer(options) {
+  if (!mathup) {
+    return (src) => `<span class="math inline">${src}</span>`;
   }
 
-  var mathml = ascii2mathml(Object.assign({}, renderingOptions));
-
-  return renderingOptions && renderingOptions.display === 'block' ?
-    function(tokens, idx) {
-      return mathml(tokens[idx].content) + '\n';
-    } :
-    function(tokens, idx) {
-      return mathml(tokens[idx].content);
-    };
+  return (src) => mathup(src, options).toString();
 }
 
+/**
+ * @param {MathupOptions} [options]
+ * @returns {(src: string) => string}
+ */
+function defaultBlockRenderer(options = {}) {
+  if (!mathup) {
+    return (src) => `<div class="math block">${src}</div>`;
+  }
 
-module.exports = function math_plugin(md, options) {
-  // Default options
-  options = typeof options === 'object' ? options : {};
-  var inlineOpen = options.inlineOpen || '$$',
-      inlineClose = options.inlineClose || '$$',
-      blockOpen = options.blockOpen || '$$$',
-      blockClose = options.blockClose || '$$$';
-  var inlineRenderer = options.inlineRenderer ?
-        function(tokens, idx) {
-          return options.inlineRenderer(tokens[idx].content, tokens[idx]);
-        } :
-      makeMathRenderer(options.renderingOptions);
-  var blockRenderer = options.blockRenderer ?
-        function(tokens, idx) {
-          return options.blockRenderer(tokens[idx].content, tokens[idx]) + '\n';
-        } :
-      makeMathRenderer(Object.assign({ display: 'block' },
-                                     options.renderingOptions));
+  return (src) =>
+    mathup(src.trim(), { ...options, display: "block" }).toString();
+}
 
-  var math_inline = makeMath_inline(inlineOpen, inlineClose);
-  var math_block = makeMath_block(blockOpen, blockClose);
+/**
+ * @typedef {Record<string, string>} AttrsOption
+ * @typedef {object} PluginOptions
+ * @property {string} [inlineOpen]
+ * @property {string} [inlineClose]
+ * @property {(src: string) => string} [inlineRenderer]
+ * @property {string} [blockOpen]
+ * @property {string} [blockClose]
+ * @property {(src: string) => string} [blockRenderer]
+ * @property {import("mathup").Options} [defaultRendererOptions]
+ * @typedef {import("markdown-it").PluginWithOptions<PluginOptions>} Plugin
+ */
 
-  md.inline.ruler.before('escape', 'math_inline', math_inline);
-  md.block.ruler.after('blockquote', 'math_block', math_block, {
-    alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
+/**
+ * @type {Plugin}
+ */
+export default function markdownItMath(
+  md,
+  {
+    inlineOpen = "$",
+    inlineClose = "$",
+    blockOpen = "$$",
+    blockClose = "$$",
+    defaultRendererOptions,
+    inlineRenderer = defaultInlineRenderer(defaultRendererOptions),
+    blockRenderer = defaultBlockRenderer(defaultRendererOptions),
+  } = {},
+) {
+  const inlineMathRule = createInlineMathRule(inlineOpen, inlineClose);
+  const blockMathRule = createBlockMathRule(blockOpen, blockClose);
+
+  md.inline.ruler.before("escape", "math_inline", inlineMathRule);
+  md.block.ruler.after("blockquote", "math_block", blockMathRule, {
+    alt: ["paragraph", "reference", "blockquote", "list"],
   });
-  md.renderer.rules.math_inline = inlineRenderer;
-  md.renderer.rules.math_block = blockRenderer;
-};
+
+  md.renderer.rules.math_inline = (tokens, idx) =>
+    inlineRenderer(tokens[idx].content);
+
+  md.renderer.rules.math_block = (tokens, idx) =>
+    `${blockRenderer(tokens[idx].content)}\n`;
+}
