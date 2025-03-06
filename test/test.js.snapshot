@@ -27,11 +27,11 @@ exports[`Block Math > Can span multiple lines 1`] = `
 `;
 
 exports[`Block Math > Multiline block math 1`] = `
-"<math display=\\"block\\"><mn>1</mn><mspace depth=\\"1em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"2em\\" /><mo>=</mo><mn>2</mn></math>\\n"
+"<math display=\\"block\\"><mspace depth=\\"1em\\" /><mspace width=\\"0.35ex\\" /><mn>1</mn><mspace depth=\\"1em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"2em\\" /><mo>=</mo><mn>2</mn><mspace depth=\\"1em\\" /></math>\\n"
 `;
 
 exports[`Block Math > Multiline math that might look like an unordered list 1`] = `
-"<math display=\\"block\\"><mn>1</mn><mspace depth=\\"2em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"1em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"2em\\" /><mo>=</mo><mn>3</mn></math>\\n"
+"<math display=\\"block\\"><mspace width=\\"0.35ex\\" /><mn>1</mn><mspace depth=\\"2em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"1em\\" /><mo>+</mo><mn>1</mn><mspace depth=\\"2em\\" /><mo>=</mo><mn>3</mn></math>\\n"
 `;
 
 exports[`Block Math > Paragraph breaks around delims are not required 1`] = `
@@ -111,7 +111,7 @@ exports[`Options > Thick dollar delims 1`] = `
 `;
 
 exports[`Options > Use TexZilla as renderer > block 1`] = `
-"<math display=\\"block\\" xmlns=\\"http://www.w3.org/1998/Math/MathML\\"><semantics><mrow><mo lspace=\\"0em\\" rspace=\\"0em\\">sin</mo><mo stretchy=\\"false\\">(</mo><mn>2</mn><mi>π</mi><mo stretchy=\\"false\\">)</mo></mrow><annotation encoding=\\"TeX\\">\\\\sin(2\\\\pi)\\n</annotation></semantics></math>\\n"
+"<math display=\\"block\\" xmlns=\\"http://www.w3.org/1998/Math/MathML\\"><semantics><mrow><mo lspace=\\"0em\\" rspace=\\"0em\\">sin</mo><mo stretchy=\\"false\\">(</mo><mn>2</mn><mi>π</mi><mo stretchy=\\"false\\">)</mo></mrow><annotation encoding=\\"TeX\\">\\\\sin(2\\\\pi)</annotation></semantics></math>\\n"
 `;
 
 exports[`Options > Use TexZilla as renderer > inline 1`] = `

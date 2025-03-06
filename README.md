@@ -101,7 +101,7 @@ use the default math renderer.
 
 ## Usage
 
-```javascript
+```js
 import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 
@@ -111,16 +111,17 @@ const options = {
   inlineClose: "$",
   blockOpen: "$$",
   blockClose: "$$",
-  defaultRendererOptions: {},
-  inlineRenderer: (src) => mathup(src, defaultRendererOptions).toString(),
-  blockRenderer: (src) =>
-    mathup({ ...defaultRendererOptions, display: "block" }).toString(),
+  defaultRendererOptions,
+  inlineCustomElement, // see below
+  inlineRenderer, // see below
+  blockCustomElement, // see below
+  blockRenderer, // see below
 };
 
 const md = markdownIt().use(markdownItMath, options);
 ```
 
-```javascript
+```js
 md.render(`
 A text $1+1=2$ with math.
 
@@ -134,11 +135,49 @@ $$
 
 (See [mathup][mathup] for reference about the default renderer).
 
+### Options
+
+- `inlineOpen`: The delimiter to start an inline math expression. Default `$`
+- `inlineClose`: The delimiter to close an inline math expression. Default `$`
+- `blockOpen`: The delimiter to start a block math expression. Default `$$`
+- `blockClose`: The delimiter to close a block math expression. Default `$$`
+- `defaultRendererOptions`:
+  The options passed into the default renderer. Ignored if you use a custom renderer. Default `{}`
+- `inlineCustomElement`:
+  Specify `"tag-name"` or `["tag-name", { some: "attrs" }]` if you want to
+  render inline expressions to a custom element. Ignored if you provide a
+  custom renderer.
+- `inlineRenderer`:
+  Provide a custom inline math renderer. Accepts the source content, the
+  parsed markdown-it token, and the markdown-it instance. Default:
+  ```js
+  import mathup from "mathup";
+  function defaultInlineRenderer(src, token, md) {
+    return mathup(src, defaultRendererOptions).toString();
+  }
+  ```
+- `blockCustomElement`:
+  Specify `"tag-name"` or `["tag-name", { some: "attrs" }]` if you want to
+  render block expressions to a custom element. Ignored if you provide a
+  custom renderer.
+- `blockRenderer`:
+  Provide a custom block math renderer. Accepts the source content, the
+  parsed markdown-it token, and the markdown-it instance. Default:
+  ```js
+  import mathup from "mathup";
+  function defaultBlockRenderer(src, token, md) {
+    return mathup(src, {
+      ...defaultRendererOptions,
+      display: "block",
+    }).toString();
+  }
+  ```
+
 ## Examples
 
 Using comma as a decimal mark
 
-```javascript
+```js
 import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 
@@ -150,9 +189,30 @@ md.render("$40,2$");
 // <p><math><mn>40,2</mn></math></p>
 ```
 
+Render to a custom `<la-tex>` element
+
+```js
+import markdownIt from "markdown-it";
+import markdownItMath from "markdown-it-math";
+
+const md = markdownIt().use(markdownItMath, {
+  inlineCustomElement: "la-tex",
+  blockCustomElement: ["la-tex", { display: "block" }],
+});
+
+md.render(String.raw`
+$\sin(2\pi)$.
+$$
+\int_{0}^{\infty} E[X]
+$$
+`);
+// <p><la-tex>\sin(2\pi)</la-tex>.</p>
+// <la-tex display="block">\int_{0}^{\infty} E[X]</la-tex>
+```
+
 Using [TeXZilla][texzilla] as renderer
 
-```javascript
+```js
 import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 import texzilla from "texzilla";
@@ -166,9 +226,9 @@ md.render("$\\sin(2\\pi)$");
 // <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
 ```
 
-Using LaTeX style delimiters
+Using LaTeX style delimiters:
 
-```javascript
+```js
 import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 

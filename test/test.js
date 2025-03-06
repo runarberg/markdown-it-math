@@ -1,6 +1,8 @@
-import { suite, test } from "node:test";
+import assert from "node:assert/strict";
+import { mock, suite, test } from "node:test";
 
 import markdownIt from "markdown-it";
+import Token from "markdown-it/lib/token.mjs";
 import texzilla from "texzilla";
 
 import markdownItMath from "../index.js";
@@ -284,6 +286,68 @@ $$`;
 
     test("block", (t) => {
       t.assert.snapshot(md.render("$$\n\\sin(2\\pi)\n$$"));
+    });
+  });
+
+  suite("renderer", () => {
+    test("Custom renderer", () => {
+      const md = markdownIt().use(markdownItMath, {
+        inlineRenderer: (src) => `<inline-math>${src}</inline-math>`,
+        blockRenderer: (src) => `<block-math>${src}</block-math>`,
+      });
+
+      const res = md.render("$foo$\n$$\nbar\n$$");
+
+      assert.equal(
+        res,
+        "<p><inline-math>foo</inline-math></p>\n<block-math>bar</block-math>\n",
+      );
+    });
+
+    test("Correct arguments passed into renderer", () => {
+      const inlineRenderer = mock.fn((_src, _token, _md) => "");
+      const blockRenderer = mock.fn((_src, _token, _md) => "");
+      const md = markdownIt().use(markdownItMath, {
+        inlineRenderer,
+        blockRenderer,
+      });
+
+      md.render("$foo$\n$$\nbar\n$$");
+
+      {
+        const [firstCall] = inlineRenderer.mock.calls;
+        assert.ok(firstCall);
+
+        const args = firstCall.arguments;
+
+        assert.equal(args[0], "foo");
+        assert.equal(args[1] instanceof Token, true);
+        assert.equal(args[2], md);
+      }
+      {
+        const [firstCall] = blockRenderer.mock.calls;
+        assert.ok(firstCall);
+
+        const args = firstCall.arguments;
+
+        assert.equal(args[0], "bar");
+        assert.equal(args[1] instanceof Token, true);
+        assert.equal(args[2], md);
+      }
+    });
+
+    test("customElement", () => {
+      const md = markdownIt().use(markdownItMath, {
+        inlineCustomElement: "my-el",
+        blockCustomElement: ["my-el", { some: "attr" }],
+      });
+
+      const res = md.render("$foo$\n$$\nbar\n$$");
+
+      assert.equal(
+        res,
+        '<p><my-el>foo</my-el></p>\n<my-el some="attr">bar</my-el>\n',
+      );
     });
   });
 });

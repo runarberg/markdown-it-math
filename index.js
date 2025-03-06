@@ -1,5 +1,6 @@
 /**
  * @typedef {import("mathup").Options} MathupOptions
+ * @typedef {import("markdown-it").default} MarkdownIt
  * @typedef {import("markdown-it/lib/parser_block.mjs").RuleBlock} RuleBlock
  * @typedef {import("markdown-it/lib/parser_inline.mjs").RuleInline} RuleInline
  * @typedef {import("markdown-it/lib/rules_block/state_block.mjs").default} StateBlock
@@ -203,11 +204,12 @@ function createBlockMathRule(open, close) {
 
     const token = state.push("math_block", "math", 0);
     token.block = true;
-    token.content =
-      (firstLine && firstLine.trim() ? `${firstLine}\n` : "") +
-      state.getLines(startLine + 1, nextLine, len, true) +
-      (lastLine && lastLine.trim() ? lastLine : "");
 
+    const firstLineContent = firstLine && firstLine.trim() ? firstLine : "";
+    const contentLines = state.getLines(startLine + 1, nextLine, len, false);
+    const lastLineContent = lastLine && lastLine.trim() ? lastLine : "";
+
+    token.content = `${firstLineContent}${firstLineContent && (contentLines || lastLineContent) ? "\n" : ""}${contentLines}${contentLines && lastLineContent ? "\n" : ""}${lastLineContent}`;
     token.map = [startLine, state.line];
     token.markup = open;
 
@@ -216,46 +218,75 @@ function createBlockMathRule(open, close) {
 }
 
 /**
- * @param {MathupOptions} [options]
+ * @typedef {string | [tag: string, attrs?: Record<string, string>]} CustomElementOption
+ * @param {CustomElementOption} customElementOption
+ * @param {MarkdownIt} md
  * @returns {(src: string) => string}
  */
-function defaultInlineRenderer(options) {
+function createCustomElementRenderer(customElementOption, md) {
+  const { escapeHtml } = md.utils;
+
+  /** @type {string} */
+  let tag;
+  let attrs = "";
+  if (typeof customElementOption === "string") {
+    tag = customElementOption;
+  } else {
+    const [tagName, attrsObj = {}] = customElementOption;
+    tag = tagName;
+
+    for (const [key, value] of Object.entries(attrsObj)) {
+      attrs += ` ${key}="${escapeHtml(value)}"`;
+    }
+  }
+
+  return (src) => `<${tag}${attrs}>${escapeHtml(src)}</${tag}>`;
+}
+
+/**
+ * @param {MathupOptions} options
+ * @param {MarkdownIt} md
+ * @returns {(src: string) => string}
+ */
+function defaultInlineRenderer(options, md) {
   if (!mathup) {
-    return (src) => `<span class="math inline">${src}</span>`;
+    return createCustomElementRenderer(["span", { class: "math inline" }], md);
   }
 
   return (src) => mathup(src, options).toString();
 }
 
 /**
- * @param {MathupOptions} [options]
+ * @param {MathupOptions} options
+ * @param {MarkdownIt} md
  * @returns {(src: string) => string}
  */
-function defaultBlockRenderer(options = {}) {
+function defaultBlockRenderer(options, md) {
   if (!mathup) {
-    return (src) => `<div class="math block">${src}</div>`;
+    return createCustomElementRenderer(["div", { class: "math block" }], md);
   }
 
-  return (src) =>
-    mathup(src.trim(), { ...options, display: "block" }).toString();
+  return (src) => mathup(src, { ...options, display: "block" }).toString();
 }
 
 /**
- * @typedef {Record<string, string>} AttrsOption
+ * @callback Renderer
+ * @param {string} src - The source content
+ * @param {Token} token - The parsed markdown-it token
+ * @param {MarkdownIt} md - The markdown-it instance
  * @typedef {object} PluginOptions
- * @property {string} [inlineOpen]
- * @property {string} [inlineClose]
- * @property {(src: string, token: Token) => string} [inlineRenderer]
- * @property {string} [blockOpen]
- * @property {string} [blockClose]
- * @property {(src: string, token: Token) => string} [blockRenderer]
- * @property {import("mathup").Options} [defaultRendererOptions]
- * @typedef {import("markdown-it").PluginWithOptions<PluginOptions>} Plugin
+ * @property {string} [inlineOpen] - Inline math open delimiter.
+ * @property {string} [inlineClose] - Inline math close delimeter.
+ * @property {CustomElementOption} [inlineCustomElement] - If you want to render to a custom element.
+ * @property {MathupOptions} [defaultRendererOptions] - The options passed into the default renderer.
+ * @property {Renderer} [inlineRenderer] - Custom renderer for inline math. Default mathup.
+ * @property {string} [blockOpen] - Block math open delimter.
+ * @property {string} [blockClose] - Block math close delimter.
+ * @property {CustomElementOption} [blockCustomElement] - If you want to render to a custom element.
+ * @property {Renderer} [blockRenderer] - Custom renderer for block math. Default mathup with display = "block".
  */
 
-/**
- * @type {Plugin}
- */
+/** @type {import("markdown-it").PluginWithOptions<PluginOptions>} */
 export default function markdownItMath(
   md,
   {
@@ -263,9 +294,17 @@ export default function markdownItMath(
     inlineClose = "$",
     blockOpen = "$$",
     blockClose = "$$",
-    defaultRendererOptions,
-    inlineRenderer = defaultInlineRenderer(defaultRendererOptions),
-    blockRenderer = defaultBlockRenderer(defaultRendererOptions),
+    defaultRendererOptions = {},
+
+    inlineCustomElement,
+    inlineRenderer = inlineCustomElement
+      ? createCustomElementRenderer(inlineCustomElement, md)
+      : defaultInlineRenderer(defaultRendererOptions, md),
+
+    blockCustomElement,
+    blockRenderer = blockCustomElement
+      ? createCustomElementRenderer(blockCustomElement, md)
+      : defaultBlockRenderer(defaultRendererOptions, md),
   } = {},
 ) {
   const inlineMathRule = createInlineMathRule(inlineOpen, inlineClose);
@@ -277,8 +316,8 @@ export default function markdownItMath(
   });
 
   md.renderer.rules.math_inline = (tokens, idx) =>
-    inlineRenderer(tokens[idx].content, tokens[idx]);
+    inlineRenderer(tokens[idx].content, tokens[idx], md);
 
   md.renderer.rules.math_block = (tokens, idx) =>
-    `${blockRenderer(tokens[idx].content, tokens[idx])}\n`;
+    `${blockRenderer(tokens[idx].content, tokens[idx], md)}\n`;
 }
