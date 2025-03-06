@@ -6,7 +6,7 @@
   "main": "index.js",
   "types": "types/index.js",
   "scripts": {
-    "clean": "rm -fr types/",
+    "clean": "rm -fr coverage/ types/",
     "check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
@@ -48,7 +48,6 @@
     "globals": "^16.0.0",
     "markdown-it": "^14.1.0",
     "prettier": "3.5.3",
-    "rollup": "^4.34.9",
     "texzilla": "^1.0.2",
     "typescript": "^5.8.2"
   },

@@ -4,6 +4,7 @@
  * @typedef {import("markdown-it/lib/parser_inline.mjs").RuleInline} RuleInline
  * @typedef {import("markdown-it/lib/rules_block/state_block.mjs").default} StateBlock
  * @typedef {import("markdown-it/lib/rules_inline/state_inline.mjs").default} StateInline
+ * @typedef {import("markdown-it/lib/token.mjs").default} Token
  */
 
 /** @type {import("mathup").default | undefined} */
@@ -244,10 +245,10 @@ function defaultBlockRenderer(options = {}) {
  * @typedef {object} PluginOptions
  * @property {string} [inlineOpen]
  * @property {string} [inlineClose]
- * @property {(src: string) => string} [inlineRenderer]
+ * @property {(src: string, token: Token) => string} [inlineRenderer]
  * @property {string} [blockOpen]
  * @property {string} [blockClose]
- * @property {(src: string) => string} [blockRenderer]
+ * @property {(src: string, token: Token) => string} [blockRenderer]
  * @property {import("mathup").Options} [defaultRendererOptions]
  * @typedef {import("markdown-it").PluginWithOptions<PluginOptions>} Plugin
  */
@@ -276,8 +277,8 @@ export default function markdownItMath(
   });
 
   md.renderer.rules.math_inline = (tokens, idx) =>
-    inlineRenderer(tokens[idx].content);
+    inlineRenderer(tokens[idx].content, tokens[idx]);
 
   md.renderer.rules.math_block = (tokens, idx) =>
-    `${blockRenderer(tokens[idx].content)}\n`;
+    `${blockRenderer(tokens[idx].content, tokens[idx])}\n`;
 }
