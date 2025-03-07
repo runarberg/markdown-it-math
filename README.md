@@ -81,7 +81,8 @@ npm install mathup --save
 
 ### In a browser
 
-Use an [importmap][importmap]. Change `/path/to/modules` to the location of your modules.
+Use an [importmap][importmap]. Change `/path/to/modules` to the
+location of your modules.
 
 ```html
 <!--mathup is optional -->
@@ -107,10 +108,8 @@ import markdownItMath from "markdown-it-math";
 
 // Optional (with defaults)
 const options = {
-  inlineOpen: "$",
-  inlineClose: "$",
-  blockOpen: "$$",
-  blockClose: "$$",
+  inlineDelimiters: ["$", ["$`", "`$"]]
+  blockDelimiters: "$$",
   defaultRendererOptions,
   inlineCustomElement, // see below
   inlineRenderer, // see below
@@ -137,12 +136,16 @@ $$
 
 ### Options
 
-- `inlineOpen`: The delimiter to start an inline math expression. Default `$`
-- `inlineClose`: The delimiter to close an inline math expression. Default `$`
-- `blockOpen`: The delimiter to start a block math expression. Default `$$`
-- `blockClose`: The delimiter to close a block math expression. Default `$$`
-- `defaultRendererOptions`:
-  The options passed into the default renderer. Ignored if you use a custom renderer. Default `{}`
+- `inlineDelimiters`: A string, or an array of strings (or pairs of
+  strings) specifying delimiters for inline math expressions. If a
+  string, the same delimiter is used for open and close. If a pair of
+  strings, the first string opens and the second one closes. Empty
+  strings or pairs containing empty strings are ignored. If no valid
+  strings or pairs are provided, it will turn off the rule.
+  Default ``["$", ["$`", "`$"]]``.
+- `blockDelimiters`: Same as above, but for block expressions. Default `"$$"`.
+- `defaultRendererOptions`: The options passed into the default
+  renderer. Ignored if you use a custom renderer. Default `{}`
 - `inlineCustomElement`:
   Specify `"tag-name"` or `["tag-name", { some: "attrs" }]` if you want to
   render inline expressions to a custom element. Ignored if you provide a
@@ -226,6 +229,27 @@ md.render("$\\sin(2\\pi)$");
 // <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
 ```
 
+Turning off inline math:
+
+```js
+import markdownIt from "markdown-it";
+import markdownItMath from "markdown-it-math";
+
+const md = markdownIt().use(markdownItMath, {
+  inlineDelimiters: "",
+});
+```
+
+```md
+Only block math is allowed. $a^2$ will not render into inline math.
+
+But this will render into block math:
+
+$$
+a^2
+$$
+```
+
 Using LaTeX style delimiters:
 
 ```js
@@ -233,27 +257,24 @@ import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 
 const md = markdownIt().use(markdownItMath, {
-  inlineOpen: "\\(",
-  inlineClose: "\\)",
-  blockOpen: "\\[",
-  blockClose: "\\]",
+  inlineDelimiters: [["\\(", "\\)"]],
+  blockDelimiters: [["\\[", "\\]"]],
 });
 ```
 
 Note there are restrictions on what inline delimiters you can use,
 based on optimization for the markdown-it parser [see here for
-details][why-my-inline-rule-is-not-executed]. And block level math
-must be on its own lines with newlines separating the math from the
-delimiters.
+details][why-my-inline-rule-is-not-executed].
+
+Block level math must be on its own lines.
 
 ```markdown
 Some text with inline math \(a^2 + b^2 = c^2\)
 
-And block math
+And block math:
+\[e = sum\_(n=0)^oo 1/n!\]
 
-\[
-e = sum\_(n=0)^oo 1/n!
-\]
+This expression \[P(x \in X) = 0\] will not render.
 ```
 
 [importmap]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
@@ -270,15 +291,26 @@ e = sum\_(n=0)^oo 1/n!
 
 Version 5 introduced some breaking changes, along with dropping legacy platforms.
 
+- The `inlineOpen`, `inlineClose`, `blockOpen`, and `blockClose` options have
+  been depricated in favor of `inlineDelimiters` and `blockDelimiters`
+  respectively.
+  ```diff
+    markdownIt().use(markdownItMath, {
+  -   inlineOpen: "$",
+  -   inlineClose: "$",
+  -   blockOpen: "$$",
+  -   blockClose: "$$",
+  +   inlineDelimiters: "$",
+  +   blockDelimiters: "$$",
+    });
+  ```
 - The default delimiters changed from `$$` and `$$$` for inline and
   block math respectively to `$` and `$$`. If you want to keep the
   thicker variants, you must set the relevant options:
   ```js
   markdownIt().use(markdownItMath, {
-    inlineOpen: "$$",
-    inlineClose: "$$",
-    blockOpen: "$$$",
-    blockClose: "$$$",
+    inlineDelimiters: "$$",
+    blockDelimiters: "$$$",
   });
   ```
 - The options passed into the default mathup renderer has been renamed
