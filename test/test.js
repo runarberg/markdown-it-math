@@ -16,6 +16,24 @@ suite("Inline Math", () => {
     t.assert.snapshot(md.render(src));
   });
 
+  test("Simple inline math with $`...`$ notation", (t) => {
+    const src = "$`1+1 = 2`$";
+
+    t.assert.snapshot(md.render(src));
+  });
+
+  test("Multiple maths and text", (t) => {
+    const src = "foo $`1+1 = 2`$ bar $1+1$ quux";
+
+    t.assert.snapshot(md.render(src));
+  });
+
+  test("dollar inside math", (t) => {
+    const src = "$`$`$";
+
+    t.assert.snapshot(md.render(src));
+  });
+
   test("Whitespace immediately after opening is not allowed", (t) => {
     // just like other inline markup.
     const src = "foo$ 1+1 = 2$ bar";
@@ -25,6 +43,18 @@ suite("Inline Math", () => {
 
   test("Whitespace immediately before closing is not allowed", (t) => {
     const src = "foo $1+1 = 2 $bar";
+
+    t.assert.snapshot(md.render(src));
+  });
+
+  test("Empty expressions are not allowed", (t) => {
+    const src = "foo $$ bar";
+
+    t.assert.snapshot(md.render(src));
+  });
+
+  test("This is an ignored expression, and a space after open, both are ignored", (t) => {
+    const src = "foo $$$ bar";
 
     t.assert.snapshot(md.render(src));
   });
@@ -220,15 +250,44 @@ $$
 
     t.assert.snapshot(md.render(src));
   });
+
+  test("Matches the longest possible delimiter", (t) => {
+    const mdd = markdownIt().use(markdownItMath, {
+      blockDelimiters: ["$$", "$$$"],
+    });
+
+    const src = "$$$ $$1+1$$ $$$";
+    t.assert.snapshot(mdd.render(src));
+  });
+
+  test("Allows close delimiters as long as end of line matches", (t) => {
+    const mdd = markdownIt().use(markdownItMath, {
+      blockDelimiters: ["$$", "$$$"],
+    });
+
+    const src = "$$ $$$1+1$$$ $$";
+    t.assert.snapshot(mdd.render(src));
+  });
+
+  test("But closes on the first match on multiline", (t) => {
+    const mdd = markdownIt().use(markdownItMath, {
+      blockDelimiters: ["$$", "$$$"],
+    });
+
+    const src = `
+$$
+$$$1+1$$$
+$$
+`;
+    t.assert.snapshot(mdd.render(src));
+  });
 });
 
 suite("Options", () => {
   test("Thick dollar delims", (t) => {
     const md = markdownIt().use(markdownItMath, {
-      inlineOpen: "$$",
-      inlineClose: "$$",
-      blockOpen: "$$$",
-      blockClose: "$$$",
+      inlineDelimiters: "$$",
+      blockDelimiters: "$$$",
     });
 
     const src = `Foo $$1+1 = 2$$ bar
@@ -241,12 +300,52 @@ $$$
     t.assert.snapshot(md.render(src));
   });
 
+  test("No delimiters turns off rules", (t) => {
+    const md = markdownIt().use(markdownItMath, {
+      inlineDelimiters: "",
+      blockDelimiters: [],
+    });
+
+    const src = `Foo $1+1 = 2$ bar
+
+$$
+1+1 = 2
+$$
+`;
+
+    t.assert.snapshot(md.render(src));
+  });
+
+  test("Empty open or close dilimeters are filtered out", (t) => {
+    const md = markdownIt().use(markdownItMath, {
+      inlineDelimiters: ["", ["", "$"]],
+      blockDelimiters: [["$$", ""]],
+    });
+
+    const src = `Foo $1+1 = 2$ bar
+
+$$
+1+1 = 2
+$$
+`;
+
+    t.assert.snapshot(md.render(src));
+  });
+
+  test("Space dollar delims", (t) => {
+    const md = markdownIt().use(markdownItMath, {
+      inlineDelimiters: [["$ ", " $"]],
+    });
+
+    const src = `Foo $ 1+1 = 2 $ bar`;
+
+    t.assert.snapshot(md.render(src));
+  });
+
   test("LaTeX style delims", (t) => {
     const md = markdownIt().use(markdownItMath, {
-      inlineOpen: "\\(",
-      inlineClose: "\\)",
-      blockOpen: "\\[",
-      blockClose: "\\]",
+      inlineDelimiters: [["\\(", "\\)"]],
+      blockDelimiters: [["\\[", "\\]"]],
     });
 
     const src = String.raw`Foo \(1+1 = 2\) bar
@@ -348,6 +447,21 @@ $$`;
         res,
         '<p><my-el>foo</my-el></p>\n<my-el some="attr">bar</my-el>\n',
       );
+    });
+  });
+
+  suite("Depricated", () => {
+    test("inlineOpen inlineClose blockOpen blockClose", (t) => {
+      const md = markdownIt().use(markdownItMath, {
+        inlineOpen: "$((",
+        inlineClose: "))$",
+        blockOpen: "$[[",
+        blockClose: "]]$",
+      });
+
+      const src = '$(("inline"))$\n$[["block"]]$';
+
+      t.assert.snapshot(md.render(src));
     });
   });
 });

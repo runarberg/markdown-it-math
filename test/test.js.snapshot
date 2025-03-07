@@ -1,3 +1,7 @@
+exports[`Block Math > Allows close delimiters as long as end of line matches 1`] = `
+"<math display=\\"block\\"><mrow><mi>$</mi><mi>$</mi><mi>$</mi><mn>1</mn><mo>+</mo><mn>1</mn><mi>$</mi><mi>$</mi><mi>$</mi></mrow></math>\\n"
+`;
+
 exports[`Block Math > Block math can be indented up to 3 spaces 1`] = `
 "<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
 `;
@@ -8,6 +12,10 @@ exports[`Block Math > Block math with apparent markup 1`] = `
 
 exports[`Block Math > But 4 means a code block 1`] = `
 "<pre><code>$$\\n1+1 = 2\\n$$\\n</code></pre>\\n"
+`;
+
+exports[`Block Math > But closes on the first match on multiline 1`] = `
+"<math display=\\"block\\"><mrow><mi>$</mi><mi>$</mi><mi>$</mi><mn>1</mn><mo>+</mo><mn>1</mn><mi>$</mi></mrow></math>\\n<math display=\\"block\\"></math>\\n"
 `;
 
 exports[`Block Math > Can appear in lists 1`] = `
@@ -24,6 +32,10 @@ exports[`Block Math > Can be written in one line 1`] = `
 
 exports[`Block Math > Can span multiple lines 1`] = `
 "<math display=\\"block\\"><mrow><mo fence=\\"true\\">[</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo fence=\\"true\\">]</mo></mrow></math>\\n"
+`;
+
+exports[`Block Math > Matches the longest possible delimiter 1`] = `
+"<math display=\\"block\\"><mrow><mi>$</mi><mi>$</mi><mn>1</mn><mo>+</mo><mn>1</mn><mi>$</mi><mi>$</mi></mrow></math>\\n"
 `;
 
 exports[`Block Math > Multiline block math 1`] = `
@@ -46,6 +58,10 @@ exports[`Inline Math > Can be escaped 1`] = `
 "<p>Foo $1$ bar</p>\\n"
 `;
 
+exports[`Inline Math > Empty expressions are not allowed 1`] = `
+"<p>foo $$ bar</p>\\n"
+`;
+
 exports[`Inline Math > End of document is not allowed 1`] = `
 "<p>foo $1+1 = 2</p>\\n"
 `;
@@ -56,6 +72,10 @@ exports[`Inline Math > Inline math with apparent markup 1`] = `
 
 exports[`Inline Math > Multiline inline math 1`] = `
 "<p>foo <math><mn>1</mn><mo>+</mo><mn>1</mn><mspace depth=\\"1em\\" /><mo>=</mo><mn>2</mn></math> bar</p>\\n"
+`;
+
+exports[`Inline Math > Multiple maths and text 1`] = `
+"<p>foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow></math> quux</p>\\n"
 `;
 
 exports[`Inline Math > Paragraph break in inline math is not allowed 1`] = `
@@ -86,6 +106,14 @@ exports[`Inline Math > Simple inline math 1`] = `
 "<p><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>\\n"
 `;
 
+exports[`Inline Math > Simple inline math with $\`...\`$ notation 1`] = `
+"<p><math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math></p>\\n"
+`;
+
+exports[`Inline Math > This is an ignored expression, and a space after open, both are ignored 1`] = `
+"<p>foo $$$ bar</p>\\n"
+`;
+
 exports[`Inline Math > Whitespace around delims is not required 1`] = `
 "<p>foo<math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>bar</p>\\n"
 `;
@@ -98,12 +126,32 @@ exports[`Inline Math > Whitespace immediately before closing is not allowed 1`] 
 "<p>foo $1+1 = 2 $bar</p>\\n"
 `;
 
+exports[`Inline Math > dollar inside math 1`] = `
+"<p><math><mi>$</mi></math></p>\\n"
+`;
+
+exports[`Options > Depricated > inlineOpen inlineClose blockOpen blockClose 1`] = `
+"<p><math><mtext>inline</mtext></math></p>\\n<math display=\\"block\\"><mtext>block</mtext></math>\\n"
+`;
+
 exports[`Options > Different options for the default renderer 1`] = `
 "<p><math><mn>40,2</mn></math></p>\\n<math display=\\"block\\"><mn>40,2</mn></math>\\n"
 `;
 
+exports[`Options > Empty open or close dilimeters are filtered out 1`] = `
+"<p>Foo $1+1 = 2$ bar</p>\\n<p>$$\\n1+1 = 2\\n$$</p>\\n"
+`;
+
 exports[`Options > LaTeX style delims 1`] = `
 "<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
+`;
+
+exports[`Options > No delimiters turns off rules 1`] = `
+"<p>Foo $1+1 = 2$ bar</p>\\n<p>$$\\n1+1 = 2\\n$$</p>\\n"
+`;
+
+exports[`Options > Space dollar delims 1`] = `
+"<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n"
 `;
 
 exports[`Options > Thick dollar delims 1`] = `
