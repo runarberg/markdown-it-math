@@ -93,7 +93,7 @@ function createInlineMathRule(delimiters) {
         continue;
       }
 
-      const content = state.src.slice(pos, matchStart);
+      const content = state.src.slice(pos, matchStart).replaceAll("\n", " ");
 
       if (!silent) {
         const token = state.push("math_inline", "math", 0);

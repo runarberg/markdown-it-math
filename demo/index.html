@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <title>markdown-it-math demo</title>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "markdown-it": "../node_modules/markdown-it/index.mjs",
+          "markdown-it-math": "../index.js",
+          "mathup": "../node_modules/mathup/dist/module/mathup.js",
+          "mathup/": "../node_modules/mathup/dist/",
+          "temml": "../node_modules/temml/dist/temml.mjs",
+          "temml/": "../node_modules/temml/dist/"
+        },
+        "scopes": {
+          "../node_modules/linkify-it/": {
+            "uc.micro": "../node_modules/uc.micro/index.mjs"
+          },
+          "../node_modules/markdown-it/": {
+            "entities": "../node_modules/entities/lib/esm/index.js",
+            "linkify-it": "../node_modules/linkify-it/index.mjs",
+            "mdurl": "../node_modules/mdurl/index.mjs",
+            "punycode.js": "../node_modules/punycode/punycode.es6.js",
+            "uc.micro": "../node_modules/uc.micro/index.mjs"
+          }
+        }
+      }
+    </script>
+    <script type="module" src="main.js" defer></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <h1>markdown-it-math demo</h1>
+
+    <main class="playground">
+      <form id="inputs" class="inputs">
+        <label class="markdown field">
+          <span class="label">Markdown</span>
+          <textarea name="markdown"></textarea>
+        </label>
+
+        <div class="controls">
+          <fieldset class="fieldset">
+            <legend class="legend">Math Renderer</legend>
+            <label>
+              <input type="radio" name="renderer" value="mathup" checked />
+              <span class="label">AsciiMath (Mathup)</span>
+            </label>
+
+            <label>
+              <input type="radio" name="renderer" value="temml" />
+              <span class="label">LaTeX (Temml)</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="legend">Math Delimiters</legend>
+            <label>
+              <span class="label">Inline Math</span>
+              <input name="inline-delimiters" value='["$", ["$`", "`$"]]' />
+            </label>
+
+            <label>
+              <span class="label">Block Math</span>
+              <input name="block-delimiters" value='["$$"]' />
+            </label>
+          </fieldset>
+
+          <label class="field">
+            <span class="label">Math Font</span>
+            <select name="font">
+              <option value="">Default</option>
+              <option>Asana Math</option>
+              <option>DejaVu Math Tex Gyre</option>
+              <option selected>Latin Modern Math</option>
+              <option>Libertinus Math</option>
+              <option>STIX Math</option>
+            </select>
+          </label>
+        </div>
+      </form>
+
+      <article id="output" class="output"></article>
+    </main>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-name: Coverage Badge
+name: Demo
 
 on:
   push:
@@ -33,11 +33,16 @@ jobs:
       - name: Build docs
         run: npm run test:coverage-badge
 
+      - name: Build pages
+        run: |
+          npm run demo:build
+          cp coverage/badge.svg pages/coverage-badge.svg
+
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: coverage/
+          path: pages/
 
   deploy:
     needs: build

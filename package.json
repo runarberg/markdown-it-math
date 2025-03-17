@@ -6,8 +6,9 @@
   "main": "index.js",
   "types": "types/index.js",
   "scripts": {
-    "clean": "rm -fr coverage/ types/",
+    "clean": "rm -fr coverage/ types/ pages/",
     "check": "tsc --noEmit",
+    "demo:build": "./scripts/build-pages.sh",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "prepare": "npm run types",
@@ -40,7 +41,6 @@
     "@eslint/js": "^9.21.0",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.13.9",
-    "@types/texzilla": "^0.9.4",
     "badge-maker": "^4.1.0",
     "eslint": "^9.21.0",
     "eslint-plugin-jsdoc": "^50.6.3",
@@ -48,11 +48,11 @@
     "globals": "^16.0.0",
     "markdown-it": "^14.1.0",
     "prettier": "3.5.3",
-    "texzilla": "^1.0.2",
+    "temml": "^0.11.2",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
-    "mathup": "^1.0.0-rc.3"
+    "mathup": "^1.0.0"
   },
   "peerDependenciesMeta": {
     "mathup": {

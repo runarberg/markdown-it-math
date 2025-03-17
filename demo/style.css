@@ -1,0 +1,112 @@
+@font-face {
+  font-family: "Asana Math";
+  src: url(./fonts/asana/Asana-Math.woff2);
+}
+
+@font-face {
+  font-family: "Cormorant";
+  font-stretch: normal;
+  font-style: normal;
+  font-weight: 200 900;
+  src: url("./fonts/cormorant/Cormorant-VariableFont_wght.woff2");
+}
+
+@font-face {
+  font-family: "Cormorant";
+  font-stretch: normal;
+  font-style: italic;
+  font-weight: 200 900;
+  src: url("./fonts/cormorant/Cormorant-Italic-VariableFont_wght.woff2");
+}
+
+@font-face {
+  font-family: "DejaVu Math Tex Gyre";
+  src: url(./fonts/deja-vu/DejaVuMathTeXGyre.woff2);
+}
+
+@font-face {
+  font-family: "Latin Modern Math";
+  src: url(./fonts/latin-modern/latinmodern-math.woff2);
+}
+
+@font-face {
+  font-family: "Libertinus Math";
+  src: url(./fonts/libertinus/LibertinusMath-Regular.woff2);
+}
+
+@font-face {
+  font-family: "STIX Math";
+  src: url(./fonts/stix/STIXMath-Regular.woff2);
+}
+
+body {
+  block-size: 100vh;
+  display: grid;
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  grid-template-rows: auto 1fr;
+  margin: 0;
+  padding: 0;
+}
+
+body > h1 {
+  text-align: center;
+}
+
+textarea,
+input {
+  font-family: ui-monospace, monospace;
+  font-size: 1em;
+}
+
+.playground {
+  display: grid;
+  gap: 1ex 1em;
+  grid-template:
+    "inputs output"
+    / 1fr 1fr;
+  max-block-size: 100%;
+  overflow-y: auto;
+  padding-block: 1em;
+  padding-inline: 1ex;
+
+  & > .inputs {
+    grid-area: inputs;
+  }
+
+  & > .output {
+    grid-area: output;
+  }
+
+  @media screen and (max-width: 120ch) {
+    grid-template:
+      "inputs" 1fr
+      "output" 1fr;
+  }
+}
+
+.playground .inputs {
+  display: flex;
+  flex-direction: column;
+
+  & .field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & .markdown.field,
+  & .markdown.field textarea {
+    flex-grow: 1;
+  }
+}
+
+.playground .output {
+  block-size: 100%;
+  font-family: "Cormorant", ui-serif, serif;
+  font-size: 1.2em;
+  overflow-y: auto;
+
+  & math {
+    font-family: var(--math-font-family), math;
+  }
+}

@@ -3,3 +3,6 @@
 **/*.config.js
 coverage/
 test/
+demo/
+pages/
+scripts/

@@ -1,82 +1,37 @@
 [![ci](https://github.com/runarberg/markdown-it-math/actions/workflows/ci.yml/badge.svg)](https://github.com/runarberg/markdown-it-math/actions/workflows/ci.yml)
-![Coverage](https://runarberg.github.io/markdown-it-math/badge.svg)
+![Coverage](https://runarberg.github.io/markdown-it-math/coverage-badge.svg)
 [![npm](https://img.shields.io/npm/v/markdown-it-math.svg)](https://www.npmjs.com/package/markdown-it-math)
 [![License](https://img.shields.io/npm/l/markdown-it-math)](https://github.com/runarberg/markdown-it-math/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dm/markdown-it-math)](https://npm-stat.com/charts.html?package=markdown-it-math)
 
-**Note:** This is a general [markdown-it][markdown-it] math plugin. It
-was originally designed to render [MathML][mathml]. If you intend to
-use [MathJax][mathjax], [markdown-it-mathjax][markdown-it-mathjax]
-might be a better choise.
-
 # markdown-it-math
 
+**Note** This library defaults to rendering your equation with an
+AsciiMath dialect. If you want to use LaTeX, follow the instructions
+below.
+
 ```md
-Pythagoran theorem is $a^2 + b^2 = c^2$.
+Pythagorean theorem is $a^2 + b^2 = c^2$.
 
 Bayes theorem:
 
 $$
-P(A | B) = (P(B | A)P(A)) / P(B)
+P(A | B) = (P(B | A)P(A)) / P(B) .
 $$
 ```
 
-```html
-<p>
-  Pythagoran theorem is
-  <math>
-    <msup> <mi>a</mi><mn>2</mn> </msup>
-    <mo>+</mo>
-    <msup> <mi>b</mi><mn>2</mn> </msup>
-    <mo>=</mo>
-    <msup> <mi>c</mi><mn>2</mn> </msup> </math
-  >.
-</p>
-<p>Bayes theorem:</p>
-<math>
-  <mrow>
-    <mi>P</mi>
-    <mrow>
-      <mo fence="true">(</mo>
-      <mrow><mi>A</mi><mo>|</mo><mi>B</mi></mrow>
-      <mo fence="true">)</mo>
-    </mrow>
-  </mrow>
-  <mo>=</mo>
-  <mfrac>
-    <mrow>
-      <mi>P</mi>
-      <mrow>
-        <mo fence="true">(</mo>
-        <mrow><mi>B</mi><mo>|</mo><mi>A</mi></mrow>
-        <mo fence="true">)</mo>
-      </mrow>
-      <mi>P</mi>
-      <mrow>
-        <mo fence="true">(</mo>
-        <mi>A</mi>
-        <mo fence="true">)</mo>
-      </mrow>
-    </mrow>
-    <mrow>
-      <mi>P</mi>
-      <mrow>
-        <mo fence="true">(</mo>
-        <mi>B</mi>
-        <mo fence="true">)</mo>
-      </mrow>
-    </mrow>
-  </mfrac>
-</math>
-```
+![Preview of the results from above](example-results.png)
 
 ## Installation
 
 ```bash
 npm install markdown-it-math --save
 
-# Optional (use the default math renderer)
+# Optional (use the default AsciiMath renderer)
 npm install mathup --save
+
+# Optional (use a LaTeX renderer instead)
+npm install temml --save
 ```
 
 ### In a browser
@@ -85,22 +40,27 @@ Use an [importmap][importmap]. Change `/path/to/modules` to the
 location of your modules.
 
 ```html
-<!--mathup is optional -->
+<!--mathup or temml are optional -->
 <script type="importmap">
   {
     "imports": {
       "markdown-it": "/path/to/modules/markdown-it/index.mjs",
       "markdown-it-math": "/path/to/modules/markdown-it-math/index.js",
-      "mathup": "/path/to/modules/mathup.js"
+      "mathup": "/path/to/modules/mathup.js",
+      "temml": "/path/to/modules/temml.mjs"
     }
   }
 </script>
 ```
 
-**Note** Importing mathup is optional. Only import it if you want to
-use the default math renderer.
+**Note** Importing [mathup][mathup] or [temml][temml] are
+optional. Only import mathup if you want to use it as the default
+AsciiMath renderer. Import Temml if you want to use it as the LaTeX
+renderer.
 
 ## Usage
+
+### With default AsciiMath (mathup) renderer
 
 ```js
 import markdownIt from "markdown-it";
@@ -125,14 +85,57 @@ md.render(`
 A text $1+1=2$ with math.
 
 $$
-bf A = [a, b, c
-        d, e, f
-        g, h, i]
+bf A._(3 xx 3) =
+[a_(1 1), a_(1 2), a_(1 3)
+ a_(2 1), a_(2 2), a_(2 3)
+ a_(3 1), a_(3 2), a_(3 3)]
 $$
 `);
 ```
 
-(See [mathup][mathup] for reference about the default renderer).
+You may also want to include the stylesheet from mathup. See
+[mathup][mathup] for reference and usage instructions about the
+default renderer.
+
+### LaTeX (Temml)
+
+```bash
+npm install --save temml
+```
+
+```js
+import markdownIt from "markdown-it";
+import markdownItMath from "markdown-it-math";
+import temml from "temml";
+
+// Optional, if you want macros to persit across equations.
+const macros = {};
+
+const md = markdownIt().use(markdownItMath, {
+  inlineRenderer: (src) => temml.renderToString(src, { macros }),
+  blockRenderer: (src) =>
+    temml.renderToString(src, { displayStyle: true, macros }),
+});
+```
+
+```js
+md.render(`
+A text $1+1=2$ with math.
+
+$$
+\underset{3 \times 3}{\mathbf{A}} =
+\begin{bmatrix}
+  a_{1 1} & a_{1 2} & c_{1 3} \\
+  a_{2 1} & a_{2 2} & c_{2 3} \\
+  a_{3 1} & a_{3 2} & c_{3 3}
+\end{bmatrix}
+$$
+`);
+```
+
+You may also want to include the stylesheets and fonts from Temml. See
+[Temml][temml] for reference and usage instructions about the
+default renderer.
 
 ### Options
 
@@ -153,12 +156,15 @@ $$
 - `inlineRenderer`:
   Provide a custom inline math renderer. Accepts the source content, the
   parsed markdown-it token, and the markdown-it instance. Default:
+
   ```js
   import mathup from "mathup";
+
   function defaultInlineRenderer(src, token, md) {
     return mathup(src, defaultRendererOptions).toString();
   }
   ```
+
 - `blockCustomElement`:
   Specify `"tag-name"` or `["tag-name", { some: "attrs" }]` if you want to
   render block expressions to a custom element. Ignored if you provide a
@@ -166,8 +172,10 @@ $$
 - `blockRenderer`:
   Provide a custom block math renderer. Accepts the source content, the
   parsed markdown-it token, and the markdown-it instance. Default:
+
   ```js
   import mathup from "mathup";
+
   function defaultBlockRenderer(src, token, md) {
     return mathup(src, {
       ...defaultRendererOptions,
@@ -185,7 +193,7 @@ import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 
 const md = markdownIt().use(markdownItMath, {
-  renderingOptions: { decimalMark: "," },
+  defaultRendererOptions: { decimalMark: "," },
 });
 
 md.render("$40,2$");
@@ -211,22 +219,6 @@ $$
 `);
 // <p><la-tex>\sin(2\pi)</la-tex>.</p>
 // <la-tex display="block">\int_{0}^{\infty} E[X]</la-tex>
-```
-
-Using [TeXZilla][texzilla] as renderer
-
-```js
-import markdownIt from "markdown-it";
-import markdownItMath from "markdown-it-math";
-import texzilla from "texzilla";
-
-const md = markdownIt().use(markdownItMath, {
-  inlineRenderer: (str) => texzilla.toMathMLString(str),
-  blockRenderer: (str) => texzilla.toMathMLString(str, true),
-});
-
-md.render("$\\sin(2\\pi)$");
-// <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\sin(2\pi)</annotation></semantics></math></p>
 ```
 
 Turning off inline math:
@@ -279,12 +271,10 @@ This expression \[P(x \in X) = 0\] will not render.
 
 [importmap]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
 [jsdelivr]: https://www.jsdelivr.com/
-[mathup]: https://runarberg.github.io/mathup/
-[mathjax]: https://www.mathjax.org/
+[mathup]: https://mathup.xyz/
 [mathml]: https://www.w3.org/TR/MathML/
 [markdown-it]: https://github.com/markdown-it/markdown-it
-[markdown-it-mathjax]: https://www.npmjs.com/package/markdown-it-mathjax
-[texzilla]: http://fred-wang.github.io/TeXZilla/
+[Temml]: https://temml.org
 [why-my-inline-rule-is-not-executed]: https://github.com/markdown-it/markdown-it/blob/master/docs/development.md#why-my-inline-rule-is-not-executed
 
 ## Upgrading From v4

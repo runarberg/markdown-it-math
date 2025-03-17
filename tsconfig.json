@@ -6,7 +6,10 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "allowJs": true,
-    "checkJs": true
+    "checkJs": true,
+    "paths": {
+      "markdown-it-math": ["./index.js"]
+    }
   },
   "include": ["**/*.js"],
   "exclude": ["coverage/"]

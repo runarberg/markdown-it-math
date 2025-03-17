@@ -25,6 +25,7 @@ export default [
       "coverage/",
       "dist/",
       "types/",
+      "pages/",
     ],
   },
 
@@ -121,6 +122,16 @@ export default [
     languageOptions: {
       globals: {
         ...globals.node,
+      },
+    },
+  },
+
+  {
+    files: ["demo/**/*.js"],
+
+    languageOptions: {
+      globals: {
+        ...globals.browser,
       },
     },
   },
