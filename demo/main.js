@@ -37,6 +37,14 @@ if (
   throw new Error("playground not in DOM");
 }
 
+{
+  const { searchParams } = new URL(window.location.href);
+
+  if (searchParams.has("latex")) {
+    rendererControl.value = "temml";
+  }
+}
+
 let renderer = rendererControl.value === "temml" ? "temml" : "mathml";
 
 /**
@@ -222,7 +230,12 @@ blockDelimitersInput.addEventListener("change", handleBlockDelimitersChange);
 handleBlockDelimitersChange();
 
 if (!textInput.value) {
-  fetch("./eulers-identity.md")
+  const startDocPath =
+    rendererControl.value === "temml"
+      ? "./eulers-identity.latex.md"
+      : "./eulers-identity.md";
+
+  fetch(startDocPath)
     .then((r) => r.text())
     .then((text) => {
       textInput.value = text;
