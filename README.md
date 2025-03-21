@@ -68,7 +68,8 @@ import markdownItMath from "markdown-it-math";
 
 // Optional (with defaults)
 const options = {
-  inlineDelimiters: ["$", ["$`", "`$"]]
+  inlineDelimiters: ["$", ["$`", "`$"]],
+  inlineAllowWhiteSpacePadding: false,
   blockDelimiters: "$$",
   defaultRendererOptions,
   inlineCustomElement, // see below
@@ -146,6 +147,11 @@ default renderer.
   strings or pairs containing empty strings are ignored. If no valid
   strings or pairs are provided, it will turn off the rule.
   Default ``["$", ["$`", "`$"]]``.
+- `inlineAllowWhiteSpacePadding`: Whether to allow whitespace
+  immediately after the opening delimiter and immediately before the
+  closing delimiter. You may want this if you use e.g. ``$`...`$`` or
+  `\(...\)` as delimiters where the risk of non-intended math
+  expression is low.
 - `blockDelimiters`: Same as above, but for block expressions. Default `"$$"`.
 - `defaultRendererOptions`: The options passed into the default
   renderer. Ignored if you use a custom renderer. Default `{}`
@@ -299,7 +305,7 @@ const md = markdownIt().use(markdownItMath, {
     return temml.renderToString(src);
   },
 
-  blockDelimiters: [$$, ["\\[", "\\]"]],
+  blockDelimiters: ["$$", ["\\[", "\\]"]],
   blockRenderer(src, token) {
     if (token.markup === "$$") {
       return mathup(src, { display: "block" }).toString();

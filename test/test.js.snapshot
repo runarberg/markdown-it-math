@@ -1,29 +1,5 @@
-exports[`Options > Depricated > inlineOpen inlineClose blockOpen blockClose 1`] = `
-"<p><math><mtext>inline</mtext></math></p>\\n<math display=\\"block\\"><mtext>block</mtext></math>\\n"
-`;
-
 exports[`Options > Different options for the default renderer 1`] = `
 "<p><math><mn>40,2</mn></math></p>\\n<math display=\\"block\\"><mn>40,2</mn></math>\\n"
-`;
-
-exports[`Options > Empty open or close dilimeters are filtered out 1`] = `
-"<p>Foo $1+1 = 2$ bar</p>\\n<p>$$\\n1+1 = 2\\n$$</p>\\n"
-`;
-
-exports[`Options > LaTeX style delims 1`] = `
-"<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
-`;
-
-exports[`Options > No delimiters turns off rules 1`] = `
-"<p>Foo $1+1 = 2$ bar</p>\\n<p>$$\\n1+1 = 2\\n$$</p>\\n"
-`;
-
-exports[`Options > Space dollar delims 1`] = `
-"<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n"
-`;
-
-exports[`Options > Thick dollar delims 1`] = `
-"<p>Foo <math><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math> bar</p>\\n<math display=\\"block\\"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mn>2</mn></math>\\n"
 `;
 
 exports[`Options > Use Temml as renderer > block 1`] = `

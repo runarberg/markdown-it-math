@@ -57,10 +57,12 @@ function fromDelimiterOption(delimiters) {
 }
 
 /**
- * @param {Array<[string, string]>} delimiters
+ * @param {object} options
+ * @param {Array<[string, string]>} options.delimiters
+ * @param {boolean} options.allowWhiteSpacePadding
  * @returns {RuleInline}
  */
-function createInlineMathRule(delimiters) {
+function createInlineMathRule({ delimiters, allowWhiteSpacePadding }) {
   return (state, silent) => {
     const start = state.pos;
 
@@ -76,8 +78,11 @@ function createInlineMathRule(delimiters) {
     for (const [open, close] of markers) {
       const pos = start + open.length;
 
-      if (state.md.utils.isWhiteSpace(state.src.charCodeAt(pos))) {
-        // Don’t allow whitespace immediately after open delimiter ... for now.
+      if (
+        state.md.utils.isWhiteSpace(state.src.charCodeAt(pos)) &&
+        !allowWhiteSpacePadding
+      ) {
+        // Don’t allow whitespace immediately after open delimiter
         continue;
       }
 
@@ -88,12 +93,19 @@ function createInlineMathRule(delimiters) {
         continue;
       }
 
-      // Don’t allow whitespace immediately before close delimiter ... for now.
-      if (state.md.utils.isWhiteSpace(state.src.charCodeAt(matchStart - 1))) {
+      if (
+        state.md.utils.isWhiteSpace(state.src.charCodeAt(matchStart - 1)) &&
+        !allowWhiteSpacePadding
+      ) {
+        // Don’t allow whitespace immediately before close delimiter
         continue;
       }
 
-      const content = state.src.slice(pos, matchStart).replaceAll("\n", " ");
+      let content = state.src.slice(pos, matchStart).replaceAll("\n", " ");
+
+      if (allowWhiteSpacePadding) {
+        content = content.replace(/^ (.+) $/, "$1");
+      }
 
       if (!silent) {
         const token = state.push("math_inline", "math", 0);
@@ -281,6 +293,7 @@ function defaultBlockRenderer(options, md) {
  * @property {string} [inlineClose] - Deprecated: Use inlineDelimiters
  * @property {CustomElementOption} [inlineCustomElement] - If you want to render to a custom element.
  * @property {Renderer} [inlineRenderer] - Custom renderer for inline math. Default mathup.
+ * @property {boolean} [inlineAllowWhiteSpacePadding] - If you want allow inline math to start or end with whitespace.
  * @property {string | Delimiter[]} [blockDelimiters] - Block math delimters.
  * @property {string} [blockOpen] - Deprecated: Use blockDelimiters
  * @property {string} [blockClose] - Deprecated: Use blockDelimiters
@@ -295,6 +308,7 @@ export default function markdownItMath(
   {
     defaultRendererOptions = {},
 
+    inlineAllowWhiteSpacePadding = false,
     inlineOpen,
     inlineClose,
     inlineDelimiters = inlineOpen && inlineClose
@@ -320,7 +334,10 @@ export default function markdownItMath(
 ) {
   const inlineDelimitersArray = fromDelimiterOption(inlineDelimiters);
   if (inlineDelimitersArray) {
-    const inlineMathRule = createInlineMathRule(inlineDelimitersArray);
+    const inlineMathRule = createInlineMathRule({
+      delimiters: inlineDelimitersArray,
+      allowWhiteSpacePadding: inlineAllowWhiteSpacePadding,
+    });
 
     md.inline.ruler.before("escape", "math_inline", inlineMathRule);
 

@@ -371,8 +371,10 @@ $$
 });
 
 suite("Options", () => {
-  test("Thick dollar delims", (t) => {
+  test("Thick dollar delims", () => {
     const md = markdownIt().use(markdownItMath, {
+      inlineCustomElement,
+      blockCustomElement,
       inlineDelimiters: "$$",
       blockDelimiters: "$$$",
     });
@@ -384,10 +386,13 @@ $$$
 $$$
 `;
 
-    t.assert.snapshot(md.render(src));
+    assert.equal(
+      md.render(src),
+      [p(`Foo ${mathspan("1+1 = 2")} bar`), mathblock("1+1 = 2")].join(""),
+    );
   });
 
-  test("No delimiters turns off rules", (t) => {
+  test("No delimiters turns off rules", () => {
     const md = markdownIt().use(markdownItMath, {
       inlineDelimiters: "",
       blockDelimiters: [],
@@ -400,13 +405,15 @@ $$
 $$
 `;
 
-    t.assert.snapshot(md.render(src));
+    assert.equal(md.render(src), p("Foo $1+1 = 2$ bar", "$$\n1+1 = 2\n$$"));
   });
 
-  test("Empty open or close dilimeters are filtered out", (t) => {
+  test("Empty open or close dilimeters are filtered out", () => {
     const md = markdownIt().use(markdownItMath, {
-      inlineDelimiters: ["", ["", "$"]],
+      blockCustomElement,
       blockDelimiters: [["$$", ""]],
+      inlineCustomElement,
+      inlineDelimiters: ["", ["", "$"]],
     });
 
     const src = `Foo $1+1 = 2$ bar
@@ -416,21 +423,37 @@ $$
 $$
 `;
 
-    t.assert.snapshot(md.render(src));
+    assert.equal(md.render(src), p("Foo $1+1 = 2$ bar", "$$\n1+1 = 2\n$$"));
   });
 
-  test("Space dollar delims", (t) => {
+  test("Space dollar delims", () => {
     const md = markdownIt().use(markdownItMath, {
+      blockCustomElement,
+      inlineCustomElement,
       inlineDelimiters: [["$ ", " $"]],
     });
 
-    const src = `Foo $ 1+1 = 2 $ bar`;
+    const src = `foo $ 1+1 = 2 $ bar`;
 
-    t.assert.snapshot(md.render(src));
+    assert.equal(md.render(src), p(`foo ${mathspan("1+1 = 2")} bar`));
   });
 
-  test("LaTeX style delims", (t) => {
+  test("Allow inline space padding", () => {
     const md = markdownIt().use(markdownItMath, {
+      blockCustomElement,
+      inlineCustomElement,
+      inlineAllowWhiteSpacePadding: true,
+    });
+
+    const src = "foo $` 1+1 = 2 `$ bar";
+
+    assert.equal(md.render(src), p(`foo ${mathspan("1+1 = 2")} bar`));
+  });
+
+  test("LaTeX style delims", () => {
+    const md = markdownIt().use(markdownItMath, {
+      inlineCustomElement,
+      blockCustomElement,
       inlineDelimiters: [["\\(", "\\)"]],
       blockDelimiters: [["\\[", "\\]"]],
     });
@@ -442,7 +465,10 @@ $$
 \]
 `;
 
-    t.assert.snapshot(md.render(src));
+    assert.equal(
+      md.render(src),
+      [p(`Foo ${mathspan("1+1 = 2")} bar`), mathblock("1+1 = 2")].join(""),
+    );
   });
 
   test("Different options for the default renderer", (t) => {
@@ -538,17 +564,22 @@ $$`;
   });
 
   suite("Depricated", () => {
-    test("inlineOpen inlineClose blockOpen blockClose", (t) => {
-      const md = markdownIt().use(markdownItMath, {
+    test("inlineOpen inlineClose blockOpen blockClose", () => {
+      const mdDepricated = markdownIt().use(markdownItMath, {
         inlineOpen: "$((",
         inlineClose: "))$",
         blockOpen: "$[[",
         blockClose: "]]$",
       });
 
+      const mdRecommended = markdownIt().use(markdownItMath, {
+        inlineDelimiters: [["$((", "))$"]],
+        blockDelimiters: [["$[[", "]]$"]],
+      });
+
       const src = '$(("inline"))$\n$[["block"]]$';
 
-      t.assert.snapshot(md.render(src));
+      assert.equal(mdDepricated.render(src), mdRecommended.render(src));
     });
   });
 });
