@@ -1,10 +1,10 @@
+# markdown-it-math
+
 [![ci](https://github.com/runarberg/markdown-it-math/actions/workflows/ci.yml/badge.svg)](https://github.com/runarberg/markdown-it-math/actions/workflows/ci.yml)
 ![Coverage](https://runarberg.github.io/markdown-it-math/coverage-badge.svg)
 [![npm](https://img.shields.io/npm/v/markdown-it-math.svg)](https://www.npmjs.com/package/markdown-it-math)
 [![License](https://img.shields.io/npm/l/markdown-it-math)](https://github.com/runarberg/markdown-it-math/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dm/markdown-it-math)](https://npm-stat.com/charts.html?package=markdown-it-math)
-
-# markdown-it-math
 
 **Note** This library defaults to rendering your equation with an
 AsciiMath dialect. If you want to use LaTeX, follow the instructions
@@ -184,9 +184,17 @@ default renderer.
   }
   ```
 
+## Alternatives
+
+- [@mdit/plugin-katex][@mdit/plugin-katex] -
+  Renders expressions to KaTeX rather than MathML
+- [markdown-it-mathspan][markdown-it-mathspan] and
+  [markdown-it-mathblock][markdown-it-mathblock] -
+  Uses commonmark inspired delimiters with customiable renderer.
+
 ## Examples
 
-Using comma as a decimal mark
+### Using comma as a decimal mark
 
 ```js
 import markdownIt from "markdown-it";
@@ -200,7 +208,10 @@ md.render("$40,2$");
 // <p><math><mn>40,2</mn></math></p>
 ```
 
-Render to a custom `<la-tex>` element
+### Render to a custom `<la-tex>` element
+
+Refer to [temml-custom-element][temml-custom-element] for usage
+instructions about the `<la-tex>` custom element.
 
 ```js
 import markdownIt from "markdown-it";
@@ -221,7 +232,7 @@ $$
 // <la-tex display="block">\int_{0}^{\infty} E[X]</la-tex>
 ```
 
-Turning off inline math:
+### Turning off inline math
 
 ```js
 import markdownIt from "markdown-it";
@@ -242,7 +253,7 @@ a^2
 $$
 ```
 
-Using LaTeX style delimiters:
+### Using LaTeX style delimiters
 
 ```js
 import markdownIt from "markdown-it";
@@ -258,24 +269,114 @@ Note there are restrictions on what inline delimiters you can use,
 based on optimization for the markdown-it parser [see here for
 details][why-my-inline-rule-is-not-executed].
 
-Block level math must be on its own lines.
+Unlike LaTeX, block level math must be on its own lines.
 
+<!-- prettier-ignore -->
 ```markdown
 Some text with inline math \(a^2 + b^2 = c^2\)
 
 And block math:
-\[e = sum\_(n=0)^oo 1/n!\]
+\[ e = sum_(n=0)^oo 1 / n! \]
 
 This expression \[P(x \in X) = 0\] will not render.
 ```
 
-[importmap]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
-[jsdelivr]: https://www.jsdelivr.com/
-[mathup]: https://mathup.xyz/
-[mathml]: https://www.w3.org/TR/MathML/
-[markdown-it]: https://github.com/markdown-it/markdown-it
-[Temml]: https://temml.org
-[why-my-inline-rule-is-not-executed]: https://github.com/markdown-it/markdown-it/blob/master/docs/development.md#why-my-inline-rule-is-not-executed
+### Different rendering for different delimiters
+
+```js
+import markdownIt from "markdown-it";
+import markdownItMath from "markdown-it-math";
+import mathup from "mathup";
+import temml from "temml";
+
+const md = markdownIt().use(markdownItMath, {
+  inlineDelimiters: ["$", ["\\(", "\\)"]],
+  inlineRenderer(src, token) {
+    if (token.markup === "$") {
+      return mathup(src).toString();
+    }
+
+    return temml.renderToString(src);
+  },
+
+  blockDelimiters: [$$, ["\\[", "\\]"]],
+  blockRenderer(src, token) {
+    if (token.markup === "$$") {
+      return mathup(src, { display: "block" }).toString();
+    }
+
+    return temml.renderToString(src, { displayMode: true });
+  },
+});
+```
+
+Now you can use both `$"AsciiMath"$` and `\(\latex\)` expressions:
+
+<!-- prettier-ignore -->
+```md
+Some text with inline AsciiMath $a^2 + b^2 = c^2$
+and inline LaTeX math \(\sin \theta\)
+
+And AsciiMath:
+$$
+e = sum_(n=0)^oo 1 / n!
+$$
+
+And LaTeX math:
+\[
+e = \sum_{n=0}^{\infty} \frac{1}{n!}
+\]
+```
+
+### LaTeX Preample
+
+```js
+import markdownIt from "markdown-it";
+import markdownItMath from "markdown-it-math";
+import temml from "temml";
+
+// An object to keep all the global macros.
+const macros = {};
+
+const md = markdownIt().use(markdownItMath, {
+  inlineRenderer: (src) => temml.renderToString(src, { macros }),
+
+  blockDelimiters: ["$$", ["$$ preample", "$$"]],
+  blockRenderer(src, token) {
+    if (token.markup === "$$ preample") {
+      // Add these defs to the global macros.
+      Object.assign(macros, temml.definePreamble(src));
+
+      // Don’t render anything.
+      return "";
+    }
+
+    return temml.renderToString(src, { displayMode: true, macros });
+  },
+});
+```
+
+<!-- prettier-ignore -->
+```md
+# The Expected value
+
+$$ preample
+\def\E{\mathbb{E}}
+\newcommand\d[0]{\operatorname{d}\!}
+$$
+
+Now we can use the macros defined above.
+
+$$
+\E[X] = \int_{-\infty}^{\infty} xf(x) \d{x}
+$$
+```
+
+Note that this plugin does not support [info
+strings](https://spec.commonmark.org/0.31.2/#info-string) but the open
+delimiter can be customized to look like an info string (see
+below). Consider [markdown-it-mathblock][markdown-it-mathblock] if you
+need commonmark compliant info strings.
 
 ## Upgrading From v4
 
@@ -331,3 +432,15 @@ Version 5 introduced some breaking changes, along with dropping legacy platforms
     blockRenderer: ascii2mathml({ ...mathRendererOptions, display: "block" }),
   });
   ```
+
+[@mdit/plugin-katex]: https://mdit-plugins.github.io/katex.html
+[importmap]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+[jsdelivr]: https://www.jsdelivr.com/
+[markdown-it]: https://github.com/markdown-it/markdown-it
+[markdown-it-mathblock]: https://github.com/runarberg/markdown-it-mathblock
+[markdown-it-mathspan]: https://github.com/runarberg/markdown-it-mathspan
+[mathml]: https://www.w3.org/TR/MathML/
+[mathup]: https://mathup.xyz/
+[Temml]: https://temml.org
+[temml-custom-element]: https://github.com/runarberg/temml-custom-element
+[why-my-inline-rule-is-not-executed]: https://github.com/markdown-it/markdown-it/blob/master/docs/development.md#why-my-inline-rule-is-not-executed
