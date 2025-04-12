@@ -5,6 +5,20 @@
   "description": "Markdown-it plugin to include math in your document",
   "main": "index.js",
   "types": "types/index.js",
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "types": "./types/index.d.ts"
+    },
+    "./no-default-renderer": {
+      "default": "./no-default-renderer.js",
+      "types": "./types/no-default-renderer.d.ts"
+    },
+    "./temml": {
+      "default": "./temml.js",
+      "types": "./types/temml.d.ts"
+    }
+  },
   "scripts": {
     "clean": "rm -fr coverage/ types/ pages/",
     "check": "tsc --noEmit",
@@ -17,7 +31,7 @@
     "test": "node --test --experimental-test-coverage",
     "test:coverage-badge": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter ./test/reporters/coverage-badge-reporter.js --test-reporter-destination coverage/badge.svg",
     "test:watch": "node --test --watch",
-    "types": "tsc index.js --allowJS --declaration --declarationMap --emitDeclarationOnly --esModuleInterop --outDir types"
+    "types": "tsc index.js no-default-renderer.js temml.js --allowJS --declaration --declarationMap --emitDeclarationOnly --esModuleInterop --outDir types"
   },
   "repository": {
     "type": "git",
@@ -48,14 +62,17 @@
     "globals": "^16.0.0",
     "markdown-it": "^14.1.0",
     "prettier": "3.5.3",
-    "temml": "^0.11.2",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
-    "mathup": "^1.0.0"
+    "mathup": "^1.0.0",
+    "temml": "^0.11.0"
   },
   "peerDependenciesMeta": {
     "mathup": {
+      "optional": true
+    },
+    "temml": {
       "optional": true
     }
   }

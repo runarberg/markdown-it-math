@@ -1,7 +1,3 @@
-exports[`Options > Different options for the default renderer 1`] = `
-"<p><math><mn>40,2</mn></math></p>\\n<math display=\\"block\\"><mn>40,2</mn></math>\\n"
-`;
-
 exports[`Options > Use Temml as renderer > block 1`] = `
 "<math display=\\"block\\" class=\\"tml-display\\" style=\\"display:block math;\\"><mrow><mrow><mi>sin</mi><mo>⁡</mo></mrow><mo form=\\"prefix\\" stretchy=\\"false\\">(</mo><mn>2</mn><mi>π</mi><mo form=\\"postfix\\" stretchy=\\"false\\">)</mo></mrow></math>\\n"
 `;

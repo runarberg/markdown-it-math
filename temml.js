@@ -1,41 +1,33 @@
 import plugin from "./src/plugin.js";
 
-const mathup = await import("mathup").then(
+const temml = await import("temml").then(
   (pkg) => pkg.default,
   () => null,
 );
 
 /**
  * @typedef {import("./src/plugin.js").PluginOptions} PluginOptions
- * @typedef {import("mathup").Options} MathupOptions
+ * @typedef {import("temml").Options} TemmlOptions
  * @typedef {object} ExtraOptions
- * @property {MathupOptions} [defaultRendererOptions] - DEPRICATED: use mathupOptions.
- * @property {MathupOptions} [mathupOptions] - Options passed into the mathup default renderer.
+ * @property {TemmlOptions} [temmlOptions] - Options passed into the mathup default renderer.
  * @typedef {PluginOptions & ExtraOptions} MarkdownItMathOptions
  */
 
 /** @type {import("markdown-it").PluginWithOptions<MarkdownItMathOptions>} */
-export default function markdownItMath(
-  md,
-  {
-    defaultRendererOptions,
-    mathupOptions = defaultRendererOptions,
-    ...options
-  } = {},
-) {
-  if (!mathup) {
+export default function markdownItMath(md, { temmlOptions, ...options } = {}) {
+  if (!temml) {
     return plugin(md, options);
   }
 
   let { blockRenderer, inlineRenderer } = options;
 
   if (!inlineRenderer && !options.inlineCustomElement) {
-    inlineRenderer = (src) => mathup(src, mathupOptions).toString();
+    inlineRenderer = (src) => temml.renderToString(src, temmlOptions);
   }
 
   if (!blockRenderer && !options.blockCustomElement) {
     blockRenderer = (src) =>
-      mathup(src, { ...mathupOptions, display: "block" }).toString();
+      temml.renderToString(src, { ...temmlOptions, displayMode: true });
   }
 
   return plugin(md, {

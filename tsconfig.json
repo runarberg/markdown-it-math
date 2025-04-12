@@ -11,6 +11,6 @@
       "markdown-it-math": ["./index.js"]
     }
   },
-  "include": ["**/*.js"],
+  "include": ["index.js", "no-default-renderer.js", "temml.js", "src/**/*.js"],
   "exclude": ["coverage/"]
 }

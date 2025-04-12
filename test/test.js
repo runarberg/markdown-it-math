@@ -5,10 +5,9 @@ import markdownIt from "markdown-it";
 import Token from "markdown-it/lib/token.mjs";
 import temml from "temml";
 
-import markdownItMath from "../index.js";
-
-const inlineCustomElement = ["span", { class: "math inline" }];
-const blockCustomElement = ["div", { class: "math block" }];
+import markdownItMathMathup from "../index.js";
+import markdownItMath from "../no-default-renderer.js";
+import markdownItMathTemml from "../temml.js";
 
 /**
  * @param {string} str
@@ -52,10 +51,7 @@ function ul(strs) {
 }
 
 suite("Inline Math", () => {
-  const md = markdownIt().use(markdownItMath, {
-    inlineCustomElement,
-    blockCustomElement,
-  });
+  const md = markdownIt().use(markdownItMath);
 
   test("Simple inline math", () => {
     const src = "$1+1 = 2$";
@@ -182,10 +178,7 @@ suite("Inline Math", () => {
 });
 
 suite("Block Math", () => {
-  const md = markdownIt().use(markdownItMath, {
-    inlineCustomElement,
-    blockCustomElement,
-  });
+  const md = markdownIt().use(markdownItMath);
 
   test("Simple block math", () => {
     const src = `$$
@@ -326,8 +319,6 @@ $$
   test("Matches the longest possible delimiter", () => {
     const mdd = markdownIt().use(markdownItMath, {
       blockDelimiters: ["$$", "$$$"],
-      inlineCustomElement,
-      blockCustomElement,
     });
 
     const src = "$$$ $$1+1$$ $$$";
@@ -343,8 +334,6 @@ $$
   test("Allows close delimiters as long as end of line matches", () => {
     const mdd = markdownIt().use(markdownItMath, {
       blockDelimiters: ["$$", "$$$"],
-      inlineCustomElement,
-      blockCustomElement,
     });
 
     const src = "$$ $$$1+1$$$ $$";
@@ -354,8 +343,6 @@ $$
   test("But closes on the first match on multiline", () => {
     const mdd = markdownIt().use(markdownItMath, {
       blockDelimiters: ["$$", "$$$"],
-      inlineCustomElement,
-      blockCustomElement,
     });
 
     const src = `
@@ -373,8 +360,6 @@ $$
 suite("Options", () => {
   test("Thick dollar delims", () => {
     const md = markdownIt().use(markdownItMath, {
-      inlineCustomElement,
-      blockCustomElement,
       inlineDelimiters: "$$",
       blockDelimiters: "$$$",
     });
@@ -410,9 +395,7 @@ $$
 
   test("Empty open or close dilimeters are filtered out", () => {
     const md = markdownIt().use(markdownItMath, {
-      blockCustomElement,
       blockDelimiters: [["$$", ""]],
-      inlineCustomElement,
       inlineDelimiters: ["", ["", "$"]],
     });
 
@@ -428,8 +411,6 @@ $$
 
   test("Space dollar delims", () => {
     const md = markdownIt().use(markdownItMath, {
-      blockCustomElement,
-      inlineCustomElement,
       inlineDelimiters: [["$ ", " $"]],
     });
 
@@ -440,8 +421,6 @@ $$
 
   test("Allow inline space padding", () => {
     const md = markdownIt().use(markdownItMath, {
-      blockCustomElement,
-      inlineCustomElement,
       inlineAllowWhiteSpacePadding: true,
     });
 
@@ -452,8 +431,6 @@ $$
 
   test("LaTeX style delims", () => {
     const md = markdownIt().use(markdownItMath, {
-      inlineCustomElement,
-      blockCustomElement,
       inlineDelimiters: [["\\(", "\\)"]],
       blockDelimiters: [["\\[", "\\]"]],
     });
@@ -471,9 +448,9 @@ $$
     );
   });
 
-  test("Different options for the default renderer", (t) => {
-    const md = markdownIt().use(markdownItMath, {
-      defaultRendererOptions: {
+  test("Different options for mathup", () => {
+    const md = markdownIt().use(markdownItMathMathup, {
+      mathupOptions: {
         decimalMark: ",",
       },
     });
@@ -483,7 +460,10 @@ $$
 40,2
 $$`;
 
-    t.assert.snapshot(md.render(src));
+    assert.equal(
+      md.render(src),
+      '<p><math><mn>40,2</mn></math></p>\n<math display="block"><mn>40,2</mn></math>\n',
+    );
   });
 
   suite("Use Temml as renderer", () => {
@@ -581,5 +561,69 @@ $$`;
 
       assert.equal(mdDepricated.render(src), mdRecommended.render(src));
     });
+
+    test("defaultRendererOptions", () => {
+      const mdDepricated = markdownIt().use(markdownItMath, {
+        defaultRendererOptions: {
+          decimalMark: ",",
+        },
+      });
+
+      const mdRecommended = markdownIt().use(markdownItMath, {
+        mathupOptions: {
+          decimalMark: ",",
+        },
+      });
+
+      const src = `$40,2$
+$$
+40,2
+$$`;
+
+      assert.equal(mdDepricated.render(src), mdRecommended.render(src));
+    });
+  });
+});
+
+suite("temml", () => {
+  test("no options", () => {
+    const mdTemml = markdownIt().use(markdownItMathTemml);
+    const md = markdownIt().use(markdownItMath, {
+      inlineRenderer: (str) => temml.renderToString(str),
+      blockRenderer: (str) => temml.renderToString(str, { displayMode: true }),
+    });
+
+    const src = `$1+1 = 2$
+$$
+\\sin(2\\pi)
+$$
+`;
+
+    assert.equal(mdTemml.render(src), md.render(src));
+  });
+
+  test("macros", () => {
+    const macros = temml.definePreamble(String.raw`
+\def\E{\mathbb{E}}
+\newcommand\d[0]{\operatorname{d}\!}
+`);
+
+    const mdTemml = markdownIt().use(markdownItMathTemml, {
+      temmlOptions: { macros },
+    });
+
+    const md = markdownIt().use(markdownItMath, {
+      inlineRenderer: (str) => temml.renderToString(str, { macros }),
+      blockRenderer: (str) =>
+        temml.renderToString(str, { macros, displayMode: true }),
+    });
+
+    const src = String.raw`$\E[X]$
+$$
+\E[X] = \int_{-\infty}^{\infty} xf(x) \d{x}
+$$
+`;
+
+    assert.equal(mdTemml.render(src), md.render(src));
   });
 });

@@ -10,6 +10,10 @@
 AsciiMath dialect. If you want to use LaTeX, follow the instructions
 below.
 
+**Note** [mathup][mathup] or [temml][temml] are optional peer
+dependencies, you must explicitly install either of them if you plan
+to use the default renderer (see [installation][#Installation] below).
+
 ```md
 Pythagorean theorem is $a^2 + b^2 = c^2$.
 
@@ -53,9 +57,9 @@ location of your modules.
 </script>
 ```
 
-**Note** Importing [mathup][mathup] or [temml][temml] are
-optional. Only import mathup if you want to use it as the default
-AsciiMath renderer. Import Temml if you want to use it as the LaTeX
+**Note** Adding [mathup][mathup] or [temml][temml] to your import map
+is optional. Only add mathup if you want to use it as the default
+AsciiMath renderer. Add Temml if you want to use it as the LaTeX
 renderer.
 
 ## Usage
@@ -71,7 +75,7 @@ const options = {
   inlineDelimiters: ["$", ["$`", "`$"]],
   inlineAllowWhiteSpacePadding: false,
   blockDelimiters: "$$",
-  defaultRendererOptions,
+  mathupOptions,
   inlineCustomElement, // see below
   inlineRenderer, // see below
   blockCustomElement, // see below
@@ -101,26 +105,28 @@ default renderer.
 ### LaTeX (Temml)
 
 ```bash
+# install temml as a peer dependency
 npm install --save temml
 ```
 
 ```js
 import markdownIt from "markdown-it";
-import markdownItMath from "markdown-it-math";
-import temml from "temml";
+import markdownItMathTemml from "markdown-it-math/temml";
 
 // Optional, if you want macros to persit across equations.
 const macros = {};
 
-const md = markdownIt().use(markdownItMath, {
-  inlineRenderer: (src) => temml.renderToString(src, { macros }),
-  blockRenderer: (src) =>
-    temml.renderToString(src, { displayStyle: true, macros }),
+const md = markdownIt().use(markdownItMathTemml, {
+  temmlOptions: { macros },
 });
 ```
 
+Note that the `markdown-it-math/temml` export supports the same
+options as above, except `mathupOptions`, you can use `temmlOptions`
+instead.
+
 ```js
-md.render(`
+md.render(String.raw`
 A text $1+1=2$ with math.
 
 $$
@@ -138,6 +144,26 @@ You may also want to include the stylesheets and fonts from Temml. See
 [Temml][temml] for reference and usage instructions about the
 default renderer.
 
+### No Default Renderer
+
+**`markdown-it-math/no-default-renderer`** is the minimal export. Use
+this if you want to provide your own renderer.
+
+**Note:** The other two exports use top-level await to dynamically
+import the respective peer dependency. If your environment does not
+support that, this export is recommended, in which case you should
+manually supply the renderers.
+
+```js
+import markdownIt from "markdown-it";
+import markdownItMath from "markdown-it-math/no-default-renderer";
+
+const md = markdownIt().use(markdownItMath, {
+  inlineRenderer: customInlineMathRenderer,
+  blockRenderer: customBlockMathRenderer,
+});
+```
+
 ### Options
 
 - `inlineDelimiters`: A string, or an array of strings (or pairs of
@@ -153,8 +179,11 @@ default renderer.
   `\(...\)` as delimiters where the risk of non-intended math
   expression is low.
 - `blockDelimiters`: Same as above, but for block expressions. Default `"$$"`.
-- `defaultRendererOptions`: The options passed into the default
-  renderer. Ignored if you use a custom renderer. Default `{}`
+- `mathupOptions`: The options passed to the default mathup renderer. Ignored
+  if you use a custom renderer. Default `{}`.
+- `temmlOptions`: The options passed to the temml renderer. Only available if
+  you import from `markdown-it-math/temml` Ignored if you use a custom renderer.
+  Default `{}`.
 - `inlineCustomElement`:
   Specify `"tag-name"` or `["tag-name", { some: "attrs" }]` if you want to
   render inline expressions to a custom element. Ignored if you provide a
@@ -167,7 +196,7 @@ default renderer.
   import mathup from "mathup";
 
   function defaultInlineRenderer(src, token, md) {
-    return mathup(src, defaultRendererOptions).toString();
+    return mathup(src, mathupOptions).toString();
   }
   ```
 
@@ -184,7 +213,7 @@ default renderer.
 
   function defaultBlockRenderer(src, token, md) {
     return mathup(src, {
-      ...defaultRendererOptions,
+      ...mathupOptions,
       display: "block",
     }).toString();
   }
@@ -207,7 +236,7 @@ import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 
 const md = markdownIt().use(markdownItMath, {
-  defaultRendererOptions: { decimalMark: "," },
+  mathupOptions: { decimalMark: "," },
 });
 
 md.render("$40,2$");
@@ -338,14 +367,14 @@ e = \sum_{n=0}^{\infty} \frac{1}{n!}
 
 ```js
 import markdownIt from "markdown-it";
-import markdownItMath from "markdown-it-math";
+import markdownItMathTemml from "markdown-it-math/temml";
 import temml from "temml";
 
 // An object to keep all the global macros.
 const macros = {};
 
-const md = markdownIt().use(markdownItMath, {
-  inlineRenderer: (src) => temml.renderToString(src, { macros }),
+const md = markdownIt().use(markdownItMathTemml, {
+  temmlOptions: { macros },
 
   blockDelimiters: ["$$", ["$$ preample", "$$"]],
   blockRenderer(src, token) {
@@ -384,23 +413,39 @@ delimiter can be customized to look like an info string (see
 below). Consider [markdown-it-mathblock][markdown-it-mathblock] if you
 need commonmark compliant info strings.
 
-## Upgrading From v4
+## Deprecated Options
 
-Version 5 introduced some breaking changes, along with dropping legacy platforms.
-
-- The `inlineOpen`, `inlineClose`, `blockOpen`, and `blockClose` options have
-  been depricated in favor of `inlineDelimiters` and `blockDelimiters`
-  respectively.
+- **`inlineOpen`** and **`inlineClose`** (since v5.0.0): Deprecated in favor
+  of `inlineDelimiters`:
   ```diff
     markdownIt().use(markdownItMath, {
   -   inlineOpen: "$",
   -   inlineClose: "$",
+  +   inlineDelimiters: "$",
+    });
+  ```
+- **`blockOpen`** and **`blockClose`** (since v5.0.0): Deprecated in favor
+  of `blockDelimiters`:
+  ```diff
+    markdownIt().use(markdownItMath, {
   -   blockOpen: "$$",
   -   blockClose: "$$",
-  +   inlineDelimiters: "$",
   +   blockDelimiters: "$$",
     });
   ```
+- **`defaultRendererOptions`** (since v5.2.0): Deprecated in favor of
+  `mathupOptions`:
+  ```diff
+    markdownIt().use(markdownItMath, {
+  -   defaultRendererOptions: { decimalMark: "," },
+  +   mathupOptions: { decimalMark: "," },
+    });
+  ```
+
+## Upgrading From v4
+
+Version 5 introduced some breaking changes, along with dropping legacy platforms.
+
 - The default delimiters changed from `$$` and `$$$` for inline and
   block math respectively to `$` and `$$`. If you want to keep the
   thicker variants, you must set the relevant options:
@@ -411,11 +456,11 @@ Version 5 introduced some breaking changes, along with dropping legacy platforms
   });
   ```
 - The options passed into the default mathup renderer has been renamed
-  from `renderingOptions` to `defaultRendererOptions`:
+  from `renderingOptions` to `mathupOptions`:
   ```diff
     markdownIt().use(markdownItMath, {
   -   renderingOptions: { decimalMark: ",", },
-  +   defaultRendererOptions: { decimalMark: ",", },
+  +   mathupOptions: { decimalMark: ",", },
     });
   ```
 - The default math renderer has been changed from Ascii2MathML to it’s
@@ -441,7 +486,6 @@ Version 5 introduced some breaking changes, along with dropping legacy platforms
 
 [@mdit/plugin-katex]: https://mdit-plugins.github.io/katex.html
 [importmap]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
-[jsdelivr]: https://www.jsdelivr.com/
 [markdown-it]: https://github.com/markdown-it/markdown-it
 [markdown-it-mathblock]: https://github.com/runarberg/markdown-it-mathblock
 [markdown-it-mathspan]: https://github.com/runarberg/markdown-it-mathspan
