@@ -7,16 +7,16 @@
   "types": "types/index.js",
   "exports": {
     ".": {
-      "default": "./index.js",
-      "types": "./types/index.d.ts"
+      "types": "./types/index.d.ts",
+      "default": "./index.js"
     },
     "./no-default-renderer": {
-      "default": "./no-default-renderer.js",
-      "types": "./types/no-default-renderer.d.ts"
+      "types": "./types/no-default-renderer.d.ts",
+      "default": "./no-default-renderer.js"
     },
     "./temml": {
-      "default": "./temml.js",
-      "types": "./types/temml.d.ts"
+      "types": "./types/temml.d.ts",
+      "default": "./temml.js"
     }
   },
   "scripts": {
