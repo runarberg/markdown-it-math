@@ -1,6 +1,6 @@
 /**
  * @typedef {import("mathup").Options} MathupOptions
- * @typedef {import("markdown-it").default} MarkdownIt
+ * @typedef {import("markdown-it/dist/index.cjs.js")} MarkdownIt
  * @typedef {import("markdown-it/lib/token.mjs").default} Token
  *
  * @typedef {import("./options.js").CustomElementOption} CustomElementOption
