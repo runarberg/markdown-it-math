@@ -64,16 +64,8 @@
     "prettier": "3.5.3",
     "typescript": "^5.8.2"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "mathup": "^1.0.0",
-    "temml": "^0.11.0"
-  },
-  "peerDependenciesMeta": {
-    "mathup": {
-      "optional": true
-    },
-    "temml": {
-      "optional": true
-    }
+    "temml": "^0.11.11"
   }
 }
