@@ -1,13 +1,16 @@
 import plugin from "./src/plugin.js";
 
+/**
+ * @import { Options as MathupOptions } from "mathup"
+ * @import { PluginOptions } from "./src/plugin.js"
+ */
+
 const mathup = await import("mathup").then(
   (pkg) => pkg.default,
   () => null,
 );
 
 /**
- * @typedef {import("./src/plugin.js").PluginOptions} PluginOptions
- * @typedef {import("mathup").Options} MathupOptions
  * @typedef {PluginOptions & { mathupOptions?: MathupOptions }} MarkdownItMathOptions
  */
 

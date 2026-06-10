@@ -1,13 +1,16 @@
 import plugin from "./src/plugin.js";
 
+/**
+ * @import { Options as TemmlOptions } from "temml"
+ * @import { PluginOptions } from "./src/plugin.js"
+ */
+
 const temml = await import("temml").then(
   (pkg) => pkg.default,
   () => null,
 );
 
 /**
- * @typedef {import("./src/plugin.js").PluginOptions} PluginOptions
- * @typedef {import("temml").Options} TemmlOptions
  * @typedef {object} ExtraOptions
  * @property {TemmlOptions} [temmlOptions] - Options passed into the mathup default renderer.
  * @typedef {PluginOptions & ExtraOptions} MarkdownItMathOptions
