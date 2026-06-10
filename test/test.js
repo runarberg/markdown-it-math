@@ -561,27 +561,6 @@ $$`;
 
       assert.equal(mdDepricated.render(src), mdRecommended.render(src));
     });
-
-    test("defaultRendererOptions", () => {
-      const mdDepricated = markdownIt().use(markdownItMath, {
-        defaultRendererOptions: {
-          decimalMark: ",",
-        },
-      });
-
-      const mdRecommended = markdownIt().use(markdownItMath, {
-        mathupOptions: {
-          decimalMark: ",",
-        },
-      });
-
-      const src = `$40,2$
-$$
-40,2
-$$`;
-
-      assert.equal(mdDepricated.render(src), mdRecommended.render(src));
-    });
   });
 });
 

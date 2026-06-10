@@ -31,7 +31,7 @@
     "test": "node --test --experimental-test-coverage",
     "test:coverage-badge": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter ./test/reporters/coverage-badge-reporter.js --test-reporter-destination coverage/badge.svg",
     "test:watch": "node --test --watch",
-    "types": "tsc index.js no-default-renderer.js temml.js --allowJS --declaration --declarationMap --emitDeclarationOnly --esModuleInterop --outDir types"
+    "types": "tsc --declaration --declarationMap --emitDeclarationOnly --outDir types"
   },
   "repository": {
     "type": "git",

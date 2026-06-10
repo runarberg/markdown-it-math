@@ -8,21 +8,11 @@ const mathup = await import("mathup").then(
 /**
  * @typedef {import("./src/plugin.js").PluginOptions} PluginOptions
  * @typedef {import("mathup").Options} MathupOptions
- * @typedef {object} ExtraOptions
- * @property {MathupOptions} [defaultRendererOptions] - DEPRICATED: use mathupOptions.
- * @property {MathupOptions} [mathupOptions] - Options passed into the mathup default renderer.
- * @typedef {PluginOptions & ExtraOptions} MarkdownItMathOptions
+ * @typedef {PluginOptions & { mathupOptions?: MathupOptions }} MarkdownItMathOptions
  */
 
 /** @type {import("markdown-it").PluginWithOptions<MarkdownItMathOptions>} */
-export default function markdownItMath(
-  md,
-  {
-    defaultRendererOptions,
-    mathupOptions = defaultRendererOptions,
-    ...options
-  } = {},
-) {
+export default function markdownItMath(md, { mathupOptions, ...options } = {}) {
   if (!mathup) {
     return plugin(md, options);
   }
