@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Markdown-it plugin to include math in your document",
   "main": "index.js",
-  "types": "types/index.js",
+  "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
