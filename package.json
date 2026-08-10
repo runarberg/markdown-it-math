@@ -53,14 +53,13 @@
   "homepage": "https://github.com/runarberg/markdown-it-math",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.2.0",
     "badge-maker": "^6.0.0",
     "eslint": "^10.8.1",
     "eslint-plugin-jsdoc": "^64.0.2",
     "eslint-plugin-prettier": "^5.5.6",
     "globals": "^17.9.0",
-    "markdown-it": "^14.3.0",
+    "markdown-it": "^15.0.0",
     "prettier": "3.9.6",
     "typescript": "^7.0.2"
   },

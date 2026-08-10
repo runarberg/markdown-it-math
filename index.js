@@ -1,6 +1,7 @@
 import plugin from "./src/plugin.js";
 
 /**
+ * @import { MarkdownIt } from "markdown-it";
  * @import { Options as MathupOptions } from "mathup"
  * @import { PluginOptions } from "./src/plugin.js"
  */
@@ -12,12 +13,14 @@ const mathup = await import("mathup").then(
 
 /**
  * @typedef {PluginOptions & { mathupOptions?: MathupOptions }} MarkdownItMathOptions
+ * @param {MarkdownIt} md
+ * @param {MarkdownItMathOptions} options
+ * @returns {void}
  */
-
-/** @type {import("markdown-it").PluginWithOptions<MarkdownItMathOptions>} */
 export default function markdownItMath(md, { mathupOptions, ...options } = {}) {
   if (!mathup) {
-    return plugin(md, options);
+    plugin(md, options);
+    return;
   }
 
   let { blockRenderer, inlineRenderer } = options;
@@ -31,7 +34,7 @@ export default function markdownItMath(md, { mathupOptions, ...options } = {}) {
       mathup(src, { ...mathupOptions, display: "block" }).toString();
   }
 
-  return plugin(md, {
+  plugin(md, {
     ...options,
     inlineRenderer,
     blockRenderer,

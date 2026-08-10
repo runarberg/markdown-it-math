@@ -1,3 +1,7 @@
+/**
+ * @import { Delimiter } from "../index.js"
+ */
+
 import markdownIt from "markdown-it";
 import markdownItMath from "markdown-it-math";
 import temml from "temml";
@@ -49,7 +53,7 @@ let renderer = rendererControl.value === "temml" ? "temml" : "mathml";
 
 /**
  * @param {unknown} thing
- * @returns {thing is string | import("../index.js").Delimiter[]}
+ * @returns {thing is string | Delimiter[]}
  */
 function isValidDelimiters(thing) {
   if (typeof thing === "string") {
@@ -76,7 +80,7 @@ function isValidDelimiters(thing) {
   return true;
 }
 
-/** @type {string | import("../index.js").Delimiter[] | undefined} */
+/** @type {string | Delimiter[] | undefined} */
 let inlineDelimiters;
 try {
   const value = JSON.parse(inlineDelimitersInput.value);
@@ -87,7 +91,7 @@ try {
   // pass
 }
 
-/** @type {string | import("../index.js").Delimiter[] | undefined} */
+/** @type {string | Delimiter[] | undefined} */
 let blockDelimiters;
 try {
   const value = JSON.parse(blockDelimitersInput.value);

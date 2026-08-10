@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import { mock, suite, test } from "node:test";
 
 import markdownIt from "markdown-it";
-import Token from "markdown-it/lib/token.mjs";
 import temml from "temml";
 
 import markdownItMathMathup from "../index.js";
 import markdownItMath from "../no-default-renderer.js";
 import markdownItMathTemml from "../temml.js";
+
+const { Token } = markdownIt;
 
 /**
  * @param {string} str

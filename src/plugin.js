@@ -1,9 +1,6 @@
 /**
- * @typedef {import("mathup").Options} MathupOptions
- *
- * @typedef {import("./options.js").CustomElementOption} CustomElementOption
- * @typedef {import("./options.js").Delimiter} Delimiter
- * @typedef {import("./options.js").Renderer} Renderer
+ * @import { MarkdownIt } from "markdown-it"
+ * @import { CustomElementOption, Delimiter, Renderer } from "./options.js"
  *
  * @typedef {object} PluginOptions
  * @property {string | Delimiter[]} [inlineDelimiters] - Inline math delimiters.
@@ -23,7 +20,11 @@ import { fromDelimiterOption } from "./options.js";
 import { createBlockRenderer, createInlineRenderer } from "./renderers.js";
 import { createBlockMathRule, createInlineMathRule } from "./rulers.js";
 
-/** @type {import("markdown-it").PluginWithOptions<PluginOptions>} */
+/**
+ * @param {MarkdownIt} md
+ * @param {PluginOptions} options
+ * @returns {void}
+ */
 export default function plugin(
   md,
   {

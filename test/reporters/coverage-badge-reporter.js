@@ -1,5 +1,5 @@
 /**
- * @typedef {import("node:test/reporters").TestEvent} TestEvent
+ * @import { TestEvent } from "node:test/reporters"
  */
 
 import { makeBadge } from "badge-maker";

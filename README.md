@@ -48,7 +48,7 @@ location of your modules.
 <script type="importmap">
   {
     "imports": {
-      "markdown-it": "/path/to/modules/markdown-it/index.mjs",
+      "markdown-it": "/path/to/modules/markdown-it/dist/browser/markdown-it.esm.min.mjs",
       "markdown-it-math": "/path/to/modules/markdown-it-math/index.js",
       "mathup": "/path/to/modules/mathup.js",
       "temml": "/path/to/modules/temml.mjs"

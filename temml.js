@@ -1,6 +1,7 @@
 import plugin from "./src/plugin.js";
 
 /**
+ * @import { MarkdownIt } from "markdown-it";
  * @import { Options as TemmlOptions } from "temml"
  * @import { PluginOptions } from "./src/plugin.js"
  */
@@ -12,11 +13,12 @@ const temml = await import("temml").then(
 
 /**
  * @typedef {object} ExtraOptions
- * @property {TemmlOptions} [temmlOptions] - Options passed into the mathup default renderer.
+ * @property {TemmlOptions} [temmlOptions] - Options passed into the temml renderer.
  * @typedef {PluginOptions & ExtraOptions} MarkdownItMathOptions
+ * @param {MarkdownIt} md
+ * @param {MarkdownItMathOptions} options
+ * @returns {void}
  */
-
-/** @type {import("markdown-it").PluginWithOptions<MarkdownItMathOptions>} */
 export default function markdownItMath(md, { temmlOptions, ...options } = {}) {
   if (!temml) {
     return plugin(md, options);

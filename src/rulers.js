@@ -1,6 +1,7 @@
 /**
- * @typedef {import("markdown-it/lib/parser_block.mjs").RuleBlock} RuleBlock
- * @typedef {import("markdown-it/lib/parser_inline.mjs").RuleInline} RuleInline
+ * @import { ParserBlock, ParserInline } from "markdown-it";
+ * @typedef { ReturnType<ParserBlock["ruler"]["getRules"]>[number] } RuleBlock
+ * @typedef { ReturnType<ParserInline["ruler"]["getRules"]>[number] } RuleInline
  */
 
 /**

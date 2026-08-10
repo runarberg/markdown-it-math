@@ -1,6 +1,6 @@
 /**
- * @typedef {import("markdown-it").default} MarkdownIt
- * @typedef {import("markdown-it/lib/token.mjs").default} Token
+ * @import { MarkdownIt, Token } from "markdown-it"
+ *
  * @typedef {string | [string, string]} Delimiter
  * @typedef {string | [tag: string, attrs?: Record<string, string>]} CustomElementOption
  * @callback Renderer
