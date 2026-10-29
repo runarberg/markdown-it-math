@@ -23,9 +23,14 @@ function isEscaped(src, pos) {
  * @param {object} options
  * @param {Array<[string, string]>} options.delimiters
  * @param {boolean} options.allowWhiteSpacePadding
+ * @param {boolean} [options.enableCloseDelimiterEscapes]
  * @returns {RuleInline}
  */
-export function createInlineMathRule({ delimiters, allowWhiteSpacePadding }) {
+export function createInlineMathRule({
+  delimiters,
+  allowWhiteSpacePadding,
+  enableCloseDelimiterEscapes = false,
+}) {
   return (state, silent) => {
     const start = state.pos;
 
@@ -51,9 +56,11 @@ export function createInlineMathRule({ delimiters, allowWhiteSpacePadding }) {
 
       let matchStart = state.src.indexOf(close, pos);
 
-      while (matchStart !== -1 && isEscaped(state.src, matchStart)) {
-        // Skip a close delimiter preceded by an odd number of backslashes.
-        matchStart = state.src.indexOf(close, matchStart + 1);
+      if (enableCloseDelimiterEscapes) {
+        while (matchStart !== -1 && isEscaped(state.src, matchStart)) {
+          // Skip a close delimiter preceded by an odd number of backslashes.
+          matchStart = state.src.indexOf(close, matchStart + 1);
+        }
       }
 
       if (matchStart === -1 || pos === matchStart) {

@@ -177,13 +177,10 @@ suite("Inline Math", () => {
     assert.equal(md.render(src), p("foo $1$ bar"));
   });
 
-  test("Skips an escaped close delimiter", () => {
-    const src = String.raw`Price is $\text{\$5}+x$.`;
+  test("Cannot escape closing delimiter by default", () => {
+    const src = "foo $1\\$ bar";
 
-    assert.equal(
-      md.render(src),
-      p(`Price is ${mathspan(String.raw`\text{\$5}+x`)}.`),
-    );
+    assert.equal(md.render(src), p(`foo ${mathspan("1\\")} bar`));
   });
 });
 
@@ -437,6 +434,39 @@ $$
     const src = "foo $` 1+1 = 2 `$ bar";
 
     assert.equal(md.render(src), p(`foo ${mathspan("1+1 = 2")} bar`));
+  });
+
+  suite("Enable escaped inline close delimiters", () => {
+    const md = markdownIt().use(markdownItMath, {
+      inlineEnableCloseDelimiterEscapes: true,
+    });
+
+    test("Skips an escaped close delimiter", () => {
+      const src = String.raw`Price is $\text{\$5}+x$.`;
+
+      assert.equal(
+        md.render(src),
+        p(`Price is ${mathspan(String.raw`\text{\$5}+x`)}.`),
+      );
+    });
+
+    test("Does not skip a double escaped close delimiter", () => {
+      const src = String.raw`Price is $\text{\\$5}+x$.`;
+
+      assert.equal(
+        md.render(src),
+        p(`Price is ${mathspan(String.raw`\text{\\`)}5}+x$.`),
+      );
+    });
+
+    test("Still escapes the backslashes correctly", () => {
+      const src = String.raw`Price is $\text{\\\$5}+x$.`;
+
+      assert.equal(
+        md.render(src),
+        p(`Price is ${mathspan(String.raw`\text{\\\$5}+x`)}.`),
+      );
+    });
   });
 
   test("LaTeX style delims", () => {
