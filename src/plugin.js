@@ -9,6 +9,7 @@
  * @property {CustomElementOption} [inlineCustomElement] - If you want to render to a custom element.
  * @property {Renderer} [inlineRenderer] - Custom renderer for inline math. Default mathup.
  * @property {boolean} [inlineAllowWhiteSpacePadding] - If you want allow inline math to start or end with whitespace.
+ * @property {boolean} [inlineEnableCloseDelimiterEscapes] - If you want allow escaping inline math close delimiter with backspace.
  * @property {string | Delimiter[]} [blockDelimiters] - Block math delimters.
  * @property {string} [blockOpen] - Deprecated: Use blockDelimiters
  * @property {string} [blockClose] - Deprecated: Use blockDelimiters
@@ -29,6 +30,7 @@ export default function plugin(
   md,
   {
     inlineAllowWhiteSpacePadding = false,
+    inlineEnableCloseDelimiterEscapes = false,
     inlineOpen,
     inlineClose,
     inlineDelimiters = inlineOpen && inlineClose
@@ -53,6 +55,7 @@ export default function plugin(
     const inlineMathRule = createInlineMathRule({
       delimiters: inlineDelimitersArray,
       allowWhiteSpacePadding: inlineAllowWhiteSpacePadding,
+      enableCloseDelimiterEscapes: inlineEnableCloseDelimiterEscapes,
     });
 
     md.inline.ruler.before("escape", "math_inline", inlineMathRule);

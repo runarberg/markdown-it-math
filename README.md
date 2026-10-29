@@ -74,6 +74,7 @@ import markdownItMath from "markdown-it-math";
 const options = {
   inlineDelimiters: ["$", ["$`", "`$"]],
   inlineAllowWhiteSpacePadding: false,
+  inlineEnableCloseDelimiterEscapes: false,
   blockDelimiters: "$$",
   mathupOptions,
   inlineCustomElement, // see below
@@ -178,6 +179,11 @@ const md = markdownIt().use(markdownItMath, {
   closing delimiter. You may want this if you use e.g. ``$`...`$`` or
   `\(...\)` as delimiters where the risk of non-intended math
   expression is low.
+- `inlineEnableCloseDelimiterEscapes`: Set this to true if you want to
+  be able to escape your inline close delimiter with an odd number of
+  backslashes (`\$`). Note that the escape backslashes are kept when
+  provided to the renderer. Before enabling this rule you may consider
+  using alternative delimiters, such as the default ``$`...`$``.
 - `blockDelimiters`: Same as above, but for block expressions. Default `"$$"`.
 - `mathupOptions`: The options passed to the default mathup renderer. Ignored
   if you use a custom renderer. Default `{}`.
