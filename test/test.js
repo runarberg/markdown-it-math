@@ -176,6 +176,15 @@ suite("Inline Math", () => {
 
     assert.equal(md.render(src), p("foo $1$ bar"));
   });
+
+  test("Skips an escaped close delimiter", () => {
+    const src = String.raw`Price is $\text{\$5}+x$.`;
+
+    assert.equal(
+      md.render(src),
+      p(`Price is ${mathspan(String.raw`\text{\$5}+x`)}.`),
+    );
+  });
 });
 
 suite("Block Math", () => {

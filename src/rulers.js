@@ -5,6 +5,21 @@
  */
 
 /**
+ * @param {string} src
+ * @param {number} pos
+ * @returns {boolean} Whether the character at `pos` is backslash escaped.
+ */
+function isEscaped(src, pos) {
+  let backslashes = 0;
+
+  while (pos - backslashes - 1 >= 0 && src[pos - backslashes - 1] === "\\") {
+    backslashes += 1;
+  }
+
+  return backslashes % 2 === 1;
+}
+
+/**
  * @param {object} options
  * @param {Array<[string, string]>} options.delimiters
  * @param {boolean} options.allowWhiteSpacePadding
@@ -34,7 +49,12 @@ export function createInlineMathRule({ delimiters, allowWhiteSpacePadding }) {
         continue;
       }
 
-      const matchStart = state.src.indexOf(close, pos);
+      let matchStart = state.src.indexOf(close, pos);
+
+      while (matchStart !== -1 && isEscaped(state.src, matchStart)) {
+        // Skip a close delimiter preceded by an odd number of backslashes.
+        matchStart = state.src.indexOf(close, matchStart + 1);
+      }
 
       if (matchStart === -1 || pos === matchStart) {
         // Don’t allow empty expressions.
