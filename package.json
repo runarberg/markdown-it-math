@@ -1,6 +1,6 @@
 {
   "name": "markdown-it-math",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "type": "module",
   "description": "Markdown-it plugin to include math in your document",
   "main": "index.js",
